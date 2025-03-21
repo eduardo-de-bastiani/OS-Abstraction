@@ -5,7 +5,7 @@ This project is an Operating System Abstraction Layer built using Java for the O
 
 ## Contributors
 - [eduardo-de-bastiani](https://github.com/eduardo-de-bastiani)
-- [Collaborator 1](https://github.com/collaborator1)
+- [Matheus Chong](https://github.com/Mathchong)
 - [Collaborator 2](https://github.com/collaborator2)
 - [Collaborator 3](https://github.com/collaborator3)
 - [Collaborator 4](https://github.com/collaborator4)
