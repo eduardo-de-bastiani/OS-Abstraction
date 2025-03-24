@@ -502,9 +502,19 @@ public class Sistema {
 		}
 
 		private int[] getFreePages(int qtdWords) {
-				
+
 		}
 
+	}
+
+	public record PCB(long id, int[] paginas){}
+
+	public class ProcessManager{
+		public PCB pcb[] = new List[];
+
+
+		
+		
 	}
 
 	// carga na memória
