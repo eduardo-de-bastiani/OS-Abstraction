@@ -111,6 +111,9 @@ public class Sistema {
 
 		}
 
+		// TODO: implementar TLB (Translation Lookaside Buffer)
+		// local para armazenar as traduções dos endereços virtuais para físicos
+
 		public void setAddressOfHandlers(InterruptHandling _ih, SysCallHandling _sysCall) {
 			ih = _ih; // aponta para rotinas de tratamento de int
 			sysCall = _sysCall; // aponta para rotinas de tratamento de chamadas de sistema
