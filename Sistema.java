@@ -502,7 +502,7 @@ public class Sistema {
 		}
 
 		private int[] getFreePages(int qtdWords) {
-
+				
 		}
 
 	}

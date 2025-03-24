@@ -11,3 +11,6 @@
 
 - Na CPU, devemos implementar a função de Memory Mapping (MMU) para o nosso sistema executar o programa a partir das posições lógicas das instrução
     - a entrada da função de MMU é tabela de páginas e a posição lógica da instrução
+
+- implementar classe PCB (Process Control Block)
+    - tem id e tabela de processos
