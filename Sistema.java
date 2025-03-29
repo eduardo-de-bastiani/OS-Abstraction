@@ -462,18 +462,18 @@ public class Sistema {
 			this.pageSize = pageSize;
 		}
 
-		public int[] jmAlloc(Word[] p) {
+		public Map<Integer, Integer> jmAlloc(Word[] p) {
 			int qtdWords = p.length; // Quantidade de palavras a serem alocadas
 			int qtdPages = (int) Math.ceil((double) qtdWords / pageSize); // Calcula o número de páginas necessárias
-			int[] allocatedPages = new int[qtdPages]; // Array para armazenar os índices das páginas alocadas
+			Map<Integer, Integer> pageTable = new HashMap<>(); // Tabela de páginas lógica -> física
 			int allocatedCount = 0; // Contador de páginas alocadas
 
 			// Percorre as páginas disponíveis para encontrar espaço usando "first fit"
 			for (int i = 0; i < pages.length; i++) {
 				if (!pages[i]) { // Página disponível
 					pages[i] = true; // Marca a página como alocada
-					allocatedPages[allocatedCount++] = i; // Armazena o índice da página alocada
-					
+					pageTable.put(allocatedCount, i); // Mapeia página lógica para frame físico
+					allocatedCount++;
 
 					// Copia o conteúdo para a memória
 					int startAddress = i * pageSize; // Endereço inicial da página
@@ -488,11 +488,10 @@ public class Sistema {
 								p[wordIndex].rb,
 								p[wordIndex].p);
 					}
-					
 
 					// Verifica se todas as palavras foram alocadas
 					if (allocatedCount == qtdPages) {
-						return allocatedPages;
+						return pageTable; // Retorna a tabela de páginas
 					}
 				}
 			}
@@ -502,19 +501,17 @@ public class Sistema {
 		}
 
 		private int[] getFreePages(int qtdWords) {
-
+			
 		}
 
 	}
 
-	public record PCB(long id, int[] paginas){}
+	public record PCB(long id, int[] paginas) {
+	}
 
-	public class ProcessManager{
+	public class ProcessManager {
 		public PCB pcb[] = new List[];
 
-
-		
-		
 	}
 
 	// carga na memória

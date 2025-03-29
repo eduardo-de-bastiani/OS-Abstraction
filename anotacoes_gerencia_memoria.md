@@ -1,4 +1,4 @@
-- Na classe da MemoryManager, precisamos implementar os métodos de **alocar** processos
+- Na classe da MemoryManager, precisamos implementar os métodos de **alocar** processos ✅
     - cada posição do programa é uma posição no array da memória
     - a saída deve ser uma tabela de páginas
     - cada palavra do programa deve ser **copiada** no frame da memória
