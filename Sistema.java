@@ -513,27 +513,60 @@ public class Sistema {
 
 			return freedFrames; // Retorna os frames desalocados
 		}
-
-		private int[] getFreePages(int qtdWords) {
-
-		}
-
+	
+		// private int[] getFreePages(int qtdWords) {
+	
+		// }
+	
 	}
 
-	public record PCB(long id, int[] paginas) {
+	public class PCB { // Process Control Block
+		public final int pid; // id do 
+		public final int ppid; // id do processo pai
+		// public final int uid; // id do usuario que criou
+		public int pc; // contador de programa
+		public int[] reg = new int[10]; // registradores do processo, array de 10 posições
+		public int status; // status do processo (running, ready, waiting, interrupted, terminated) podemos realizar um ENUM
+		public int priority;
+		Map<Integer, Integer> pageTable = new HashMap<>(); 
+		public String programName;
+		public boolean allowInterrupt = true; 
+
+		// de alguma forma adicionar evento que o processo está 
+		// depois teremos que adicionar comunicação entre 
+		// informações de tempo executando e aguardando
+		// recursos controlados pelo processo, como arquivos abertos
+	
+	
+		public PCB(int _pid,int _ppid ,Map<Integer,Integer> _pageTable ) { // pid é o id do processo
+			pid = _pid; 
+			ppid = _ppid;
+			pc = 0;
+			for (int i = 0; i < reg.length; i++) {
+				reg[i] = 0;
+			}
+			Map<Integer, Integer> pageTable = _pageTable; 
+			status = 0; // 0 = running, 1 = ready, 2 = blocked, 3 = terminated
+			priority = 0; // prioridade do processo
+		}
+	
 	}
 
 	public class ProcessManager {
-		public PCB pcb[] = new List[];
-
-	}
+		public PCB processRunning;
+		public List<PCB> processReady = new ArrayList<>(); // lista de processos prontos
+		public List<PCB> processBlocked = new ArrayList<>(); // lista de processos bloqueados
+		
+	}	
 
 	// carga na memória
 	public class Utilities {
 		private HW hw;
+		private MemoryManager mm;
 
-		public Utilities(HW _hw) {
+		public Utilities(HW _hw, MemoryManager _mm) {
 			hw = _hw;
+			mm = _mm;
 		}
 
 		// TODO: fazer método de paginação
@@ -571,7 +604,7 @@ public class Sistema {
 		}
 
 		private void loadAndExec(Word[] p) {
-			loadProgram(p); // carga do programa na memoria
+			mm.jmAlloc(p); // carga do programa na memoria
 			System.out.println("---------------------------------- programa carregado na memoria");
 			dump(0, p.length); // dump da memoria nestas posicoes
 			hw.cpu.setContext(0); // seta pc para endereço 0 - ponto de entrada dos programas
@@ -586,12 +619,15 @@ public class Sistema {
 		public InterruptHandling ih;
 		public SysCallHandling sc;
 		public Utilities utils;
+		public MemoryManager mm;
 
 		public SO(HW hw) {
 			ih = new InterruptHandling(hw); // rotinas de tratamento de int
 			sc = new SysCallHandling(hw); // chamadas de sistema
 			hw.cpu.setAddressOfHandlers(ih, sc);
-			utils = new Utilities(hw);
+			mm = new MemoryManager(16);
+			utils = new Utilities(hw, mm); // utilitários do sistema
+
 		}
 	}
 	// -------------------------------------------------------------------------------------------------------
