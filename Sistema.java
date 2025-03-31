@@ -513,51 +513,73 @@ public class Sistema {
 
 			return freedFrames; // Retorna os frames desalocados
 		}
-	
-		// private int[] getFreePages(int qtdWords) {
-	
-		// }
-	
+
 	}
 
 	public class PCB { // Process Control Block
-		public final int pid; // id do 
-		public final int ppid; // id do processo pai
+		public final int pid; // id do
+		// public final int ppid; // id do processo pai
 		// public final int uid; // id do usuario que criou
 		public int pc; // contador de programa
 		public int[] reg = new int[10]; // registradores do processo, array de 10 posições
-		public int status; // status do processo (running, ready, waiting, interrupted, terminated) podemos realizar um ENUM
+		public int status; // status do processo (running, ready, blocked) podemos realizar um ENUM
 		public int priority;
-		Map<Integer, Integer> pageTable = new HashMap<>(); 
+		Map<Integer, Integer> pageTable = new HashMap<>();
 		public String programName;
-		public boolean allowInterrupt = true; 
+		// public boolean allowInterrupt = true;
 
-		// de alguma forma adicionar evento que o processo está 
-		// depois teremos que adicionar comunicação entre 
+		// de alguma forma adicionar evento que o processo está
+		// depois teremos que adicionar comunicação entre
 		// informações de tempo executando e aguardando
 		// recursos controlados pelo processo, como arquivos abertos
-	
-	
-		public PCB(int _pid,int _ppid ,Map<Integer,Integer> _pageTable ) { // pid é o id do processo
-			pid = _pid; 
-			ppid = _ppid;
+
+		public PCB(int _pid, Map<Integer, Integer> _pageTable, String _name) { // pid é o id do processo
+			pid = _pid;
 			pc = 0;
 			for (int i = 0; i < reg.length; i++) {
 				reg[i] = 0;
 			}
-			Map<Integer, Integer> pageTable = _pageTable; 
-			status = 0; // 0 = running, 1 = ready, 2 = blocked, 3 = terminated
+			name = _name
+			Map<Integer, Integer> pageTable = _pageTable; //TODO CLONAR  
+			status = 1; // 0 = running, 1 = ready, 2 = blocked
 			priority = 0; // prioridade do processo
+			programName = _name;
+
 		}
-	
+
 	}
 
 	public class ProcessManager {
 		public PCB processRunning;
 		public List<PCB> processReady = new ArrayList<>(); // lista de processos prontos
 		public List<PCB> processBlocked = new ArrayList<>(); // lista de processos bloqueados
-		
-	}	
+		private int idCounter = 0;
+
+		public boolean createProcess(Program p) {
+			MemoryManager mm = new MemoryManager();
+			Map<Integer, Integer> pageTable = mm.jmAlloc(p.image);
+			idCounter++;
+			PCB pcb = new PCB(idCounter, pageTable, p.name);
+			processReady.add(pcb);
+			return true;
+		}
+
+		public void removeProcess(int id){
+
+			// iterar sobre lista de processos prontos e remover o PCB == id
+			for(int i = 0; i < processReady.size(); i++){
+				if(id == processReady[i]){
+					
+				}
+			}
+
+			// iterar sobre lista de processos bloqueados e remover o PCB == id
+
+			// chamar metodo jmfree() com o map de pages do PCB que encontramos
+			
+		}
+
+	}
 
 	// carga na memória
 	public class Utilities {
