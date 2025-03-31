@@ -470,29 +470,29 @@ public class Sistema {
 
 			// Percorre as páginas disponíveis para encontrar espaço usando "first fit"
 			for (int i = 0; i < pages.length; i++) {
-				if (!pages[i]) { // Página disponível
-					pages[i] = true; // Marca a página como alocada
-					pageTable.put(allocatedCount, i); // Mapeia página lógica para frame físico
-					allocatedCount++;
+				if (pages[i]) continue; // Página indisponível
 
-					// Copia o conteúdo para a memória
-					int startAddress = i * pageSize; // Endereço inicial da página
-					for (int offset = 0; offset < pageSize; offset++) {
-						int wordIndex = (allocatedCount - 1) * pageSize + offset;
-						if (wordIndex >= qtdWords) {
-							break;
-						}
-						Sistema.this.hw.mem.pos[startAddress + offset] = new Word(
-								p[wordIndex].opc,
-								p[wordIndex].ra,
-								p[wordIndex].rb,
-								p[wordIndex].p);
-					}
+				pages[i] = true; // Marca a página como alocada
+				pageTable.put(allocatedCount, i); // Mapeia página lógica para frame físico
+				allocatedCount++;
 
-					// Verifica se todas as palavras foram alocadas
-					if (allocatedCount == qtdPages) {
-						return pageTable; // Retorna a tabela de páginas
+				// Copia o conteúdo para a memória
+				int startAddress = i * pageSize; // Endereço inicial da página
+				for (int offset = 0; offset < pageSize; offset++) {
+					int wordIndex = (allocatedCount - 1) * pageSize + offset;
+					if (wordIndex >= qtdWords) {
+						break;
 					}
+					Sistema.this.hw.mem.pos[startAddress + offset] = new Word(
+							p[wordIndex].opc,
+							p[wordIndex].ra,
+							p[wordIndex].rb,
+							p[wordIndex].p);
+				}
+
+				// Verifica se todas as palavras foram alocadas
+				if (allocatedCount == qtdPages) {
+					return pageTable; // Retorna a tabela de páginas
 				}
 			}
 
@@ -647,7 +647,11 @@ public class Sistema {
 
 	public void run() {
 
-		so.utils.loadAndExec(progs.retrieveProgram("fatorialV2"));
+		//so.utils.loadAndExec(progs.retrieveProgram("fatorialV2"));
+
+		Commands cmds = new Commands(progs);
+
+		cmds.waitForCommands();
 
 		// so.utils.loadAndExec(progs.retrieveProgram("fatorial"));
 		// fibonacci10,
@@ -690,7 +694,7 @@ public class Sistema {
 
 		public Word[] retrieveProgram(String pname) {
 			for (Program p : progs) {
-				if (p != null & p.name == pname)
+				if (p != null & p.name.equals(pname))
 					return p.image;
 			}
 			return null;
@@ -977,5 +981,63 @@ public class Sistema {
 								new Word(Opcode.DATA, -1, -1, -1)
 						})
 		};
+	}
+
+	public class Commands {
+		public interface Comando {
+			public void execute(String[] args);
+		}
+		
+		private Programs progs;
+		public Commands(Programs programs) {
+			this.progs = programs;
+			
+		}
+	
+		private Comando newCmd = new Comando() {
+			public void execute(String[] args) {
+				String processName = args[0];
+				Word[] program = progs.retrieveProgram(processName.strip());
+				if (program == null) {
+					System.out.println("Programa não encontrado: " + processName);
+					
+					for (Program p : progs.progs) {
+						System.out.println("Programa disponível: " + p.name);
+					}
+
+					return;
+				}
+				try {
+					Map<Integer, Integer> pageTable = Sistema.this.so.mm.jmAlloc(program);
+					PCB newProcess = new PCB(Sistema.this.so.mm.pages.length, -1, pageTable);
+					newProcess.programName = processName;
+					Sistema.this.so.utils.dump(0, program.length);
+					Sistema.this.so.utils.loadAndExec(program);
+					System.out.println("Processo criado: " + processName);
+				} catch (OutOfMemoryError e) {
+					System.out.println("Erro ao criar processo: memória insuficiente.");
+				}
+			}
+		};
+
+		public void waitForCommands() {
+			Scanner scanner = new Scanner(System.in);
+			while (true) {
+				System.out.print("Digite um comando: ");
+				String typed = scanner.nextLine();
+				String[] args = typed.split(" ");
+				String command = args[0].toLowerCase(); // Comando em minúsculas para comparação
+				args = Arrays.copyOfRange(args, 1, args.length); // Ignora o primeiro argumento (comando)
+				if (command.equals("exit")) {
+					System.out.println("Saindo do programa.");
+					break;
+				} else if (command.equals("new")) {
+					newCmd.execute(args); // Executa o comando 1
+				} else {
+					System.out.println("Comando inválido. Tente novamente.");
+				}
+			}
+			scanner.close(); // Fecha o scanner quando terminar
+		}
 	}
 }
