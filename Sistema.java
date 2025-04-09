@@ -32,6 +32,8 @@ public class Sistema {
 	// --------------------- M E M O R I A - definicoes de palavra de memoria,
 	// memória ----------------------
 
+	public final int pageSize = 16;
+
 	public class Memory {
 		public Word[] pos; // pos[i] é a posição i da memória. cada posição é uma palavra.
 
@@ -526,6 +528,7 @@ public class Sistema {
 		public int priority;
 		Map<Integer, Integer> pageTable = new HashMap<>();
 		public String programName;
+		public String name; // nome do processo (programa)
 		// public boolean allowInterrupt = true;
 
 		// de alguma forma adicionar evento que o processo está
@@ -539,7 +542,7 @@ public class Sistema {
 			for (int i = 0; i < reg.length; i++) {
 				reg[i] = 0;
 			}
-			name = _name
+			name = _name;
 			Map<Integer, Integer> pageTable = _pageTable; //TODO CLONAR  
 			status = 1; // 0 = running, 1 = ready, 2 = blocked
 			priority = 0; // prioridade do processo
@@ -556,7 +559,7 @@ public class Sistema {
 		private int idCounter = 0;
 
 		public boolean createProcess(Program p) {
-			MemoryManager mm = new MemoryManager();
+			MemoryManager mm = new MemoryManager(pageSize);
 			Map<Integer, Integer> pageTable = mm.jmAlloc(p.image);
 			idCounter++;
 			PCB pcb = new PCB(idCounter, pageTable, p.name);
@@ -568,8 +571,9 @@ public class Sistema {
 
 			// iterar sobre lista de processos prontos e remover o PCB == id
 			for(int i = 0; i < processReady.size(); i++){
-				if(id == processReady[i]){
-					
+				if(id == processReady.get(i).pid){
+					processReady.remove(i);
+					break;	
 				}
 			}
 
@@ -1031,7 +1035,7 @@ public class Sistema {
 				}
 				try {
 					Map<Integer, Integer> pageTable = Sistema.this.so.mm.jmAlloc(program);
-					PCB newProcess = new PCB(Sistema.this.so.mm.pages.length, -1, pageTable);
+					PCB newProcess = new PCB(Sistema.this.so.mm.pages.length, pageTable, "sdkgsdhkgs");
 					newProcess.programName = processName;
 					Sistema.this.so.utils.dump(0, program.length);
 					Sistema.this.so.utils.loadAndExec(program);
