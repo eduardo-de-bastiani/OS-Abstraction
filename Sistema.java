@@ -559,7 +559,7 @@ public class Sistema {
 		private int idCounter = 0;
 
 		public boolean createProcess(Program p) {
-			MemoryManager mm = new MemoryManager(pageSize);
+			MemoryManager mm = new MemoryManager(pageSize); 
 			Map<Integer, Integer> pageTable = mm.jmAlloc(p.image);
 			idCounter++;
 			PCB pcb = new PCB(idCounter, pageTable, p.name);
