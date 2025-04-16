@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a68c7024-d058-44ee-82e7-4875af27abec" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OS-Abstraction.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/OS-Abstraction.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/SO-EsquematicoAula4Set.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/TrabalhoSO-A-DefinicaoHW.pages.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/TrabalhoSO-C-T1-A=GMPaginado.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/TrabalhoSO-C-T1-B=T1A+GP.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/TrabalhoSO-C-T1-C=T1B+SCH.pages.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/instrucoes_trab.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/OS-Abstraction/o_que_falta.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/CPU.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/Commands.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/HW.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/InterruptHandling.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/Interrupts.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/Main.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/Memory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/MemoryManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/Opcode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/PCB.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/ProcessManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/Program.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/Programs.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/SO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/Sistema.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/SysCallHandling.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/Utilities.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/system/Word.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sistema.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Jpbeltrand&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:eduardo-de-bastiani/OS-Abstraction.git&quot;,
+    &quot;accountId&quot;: &quot;0405c9c7-cc7c-4426-ae0c-bd64977945ef&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2vjwsB8fBkvyRIcpXL4IH5N4OhV" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "different-classes",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/jpbel/personal_projects/demosecurity2",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="system.Main" />
+      <module name="OS-Abstraction" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="system.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-a94e463ab2e7-intellij.indexing.shared.core-IU-243.26053.27" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-IU-243.26053.27" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a68c7024-d058-44ee-82e7-4875af27abec" name="Changes" comment="" />
+      <created>1744671995182</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1744671995182</updated>
+      <workItem from="1744671996284" duration="1693000" />
+      <workItem from="1744673723534" duration="259000" />
+      <workItem from="1744714891872" duration="445000" />
+      <workItem from="1744715355785" duration="496000" />
+      <workItem from="1744715893751" duration="26000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
