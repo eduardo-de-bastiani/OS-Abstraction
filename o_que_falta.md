@@ -1,8 +1,7 @@
 - MemoryManager 
     - trocar a saída do JmAlloc para lista de índices de 
 
-- ProcessManager
-    - corrigir metodo createProcess (nao podemos criar um novo MemoryManager para cada processo)
+- ProcessManagery
     - terminar metodo removeProcess
     
 - classe Commands
