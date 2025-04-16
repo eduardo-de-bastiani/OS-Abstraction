@@ -18,8 +18,16 @@ public class ProcessManager {
         this.memoryManager = new MemoryManager(sistema.pageSize, sistema.hw);
     }
 
+    public ProcessManager(Sistema sistema) {
+        this.sistema = sistema;
+    }
+
     public boolean createProcess(Program p) {
+<<<<<<< HEAD
         Map<Integer, Integer> pageTable = memoryManager.jmAlloc(p.image);
+=======
+        Map<Integer, Integer> pageTable = sistema.mm.jmAlloc(p.image);
+>>>>>>> 5615657e2f2dbcc66de973e38c76f283d2364cec
         idCounter++;
         PCB pcb = new PCB(idCounter, pageTable, p.name);
         processReady.add(pcb);

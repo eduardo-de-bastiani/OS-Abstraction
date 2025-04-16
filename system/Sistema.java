@@ -5,12 +5,16 @@ public class Sistema {
     public HW hw;
     public SO so;
     public Programs progs;
+    public MemoryManager mm;
+    public ProcessManager pm;
 
     public Sistema(int tamMem) {
         hw = new HW(tamMem); // memoria do HW tem tamMem palavras
         so = new SO(hw);
         hw.cpu.setUtilities(so.utils); // permite cpu fazer dump de memoria ao avancar
         progs = new Programs();
+        mm = new MemoryManager(pageSize, hw); // gerenciador de memoria
+        pm = new ProcessManager(this); // gerenciador de processos
     }
 
     public void run() {
