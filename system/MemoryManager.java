@@ -5,7 +5,6 @@ import java.util.*;
 public class MemoryManager {
     boolean[] pages;
     private int pageSize;
-    private Sistema sistema;
     private HW hw;
 
     public MemoryManager(int pageSize, HW hw) {
