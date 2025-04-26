@@ -1,9 +1,8 @@
 package system.software;
 
 import java.util.*;
-import system.hardware.Word;
-import system.os.SO;
 import system.core.Sistema;
+import system.hardware.Word;
 
 /**
  * Gerencia os comandos de usuário para o SO fictício.
@@ -76,10 +75,7 @@ public class Commands {
             return;
         }
         try {
-            PCB ok = sys.so.pm.createProcess(new Program(name, image));
-            if (ok != null) {
-                System.out.println("Processo " + name + " criado com sucesso com pid " + ok.pid);
-            }
+            sys.so.pm.createProcess(new Program(name, image));
         } catch (OutOfMemoryError e) {
             System.out.println("Erro ao criar processo: memória insuficiente.");
         }

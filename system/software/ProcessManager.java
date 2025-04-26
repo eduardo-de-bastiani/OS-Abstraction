@@ -9,19 +9,21 @@ public class ProcessManager {
     public List<PCB> processReady = new ArrayList<>(); // lista de processos prontos
     public List<PCB> processBlocked = new ArrayList<>(); // lista de processos bloqueados
     private int idCounter = 0;
-    private MemoryManager memoryManager;
+    final MemoryManager memoryManager;
 
 
     public ProcessManager(MemoryManager mm) {
         this.memoryManager = mm;
     }
 
-    public PCB createProcess(Program p) {
+    public boolean createProcess(Program p) {
         int[] pageTable = memoryManager.jmAlloc(p.image);
+        
         idCounter++;
         PCB pcb = new PCB(idCounter, pageTable, p.name);
         processReady.add(pcb);
-        return pcb;
+        System.out.println("Processo " + p.name + " criado com PID: " + idCounter);
+        return true;
     }
 
     public void removeProcess(int id){
