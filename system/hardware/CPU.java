@@ -257,6 +257,7 @@ public class CPU {
                         break;
 
                     case DATA: // pc está sobre área supostamente de dados
+                        System.out.println("pc está sobre área supostamente de dados");
                         irpt = Interrupts.intInstrucaoInvalida;
                         break;
 
@@ -274,6 +275,7 @@ public class CPU {
 
                     // Inexistente
                     default:
+                        System.out.println("Instrução inexistente: " + ir.opc);
                         irpt = Interrupts.intInstrucaoInvalida;
                         break;
                 }

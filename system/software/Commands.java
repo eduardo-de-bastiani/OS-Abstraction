@@ -42,7 +42,7 @@ public class Commands {
             if (line.isEmpty()) continue;
 
             String[] tokens = line.split("\\s+");
-            String cmd = tokens[0].toLowerCase();
+            String cmd = tokens[0]; //.toLowerCase();
             String[] args = Arrays.copyOfRange(tokens, 1, tokens.length);
 
             if ("exit".equals(cmd)) {
