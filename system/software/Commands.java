@@ -34,9 +34,10 @@ public class Commands {
                 return;
             }
             try {
-                Map<Integer, Integer> pageTable = so.mm.jmAlloc(program);
-                PCB newProcess = new PCB(so.mm.pages.length, pageTable, "sdkgsdhkgs");
-                newProcess.programName = processName;
+                int[] pageTable = so.mm.jmAlloc(program);
+                PCB newProcess = new PCB(so.mm.pages.length, pageTable, processName);
+                // Adiciona o novo processo à lista de processos prontos do process manager
+                
                 so.utils.dump(0, program.length);
                 so.utils.loadAndExec(program);
                 System.out.println("Processo criado: " + processName);
