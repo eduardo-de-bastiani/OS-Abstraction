@@ -15,7 +15,7 @@ public class SO {
         ih = new InterruptHandling(hw); // rotinas de tratamento de int
         sc = new SysCallHandling(hw); // chamadas de sistema
         hw.cpu.setAddressOfHandlers(ih, sc);
-        mm = new MemoryManager(tamMem, pageSize);
+        mm = new MemoryManager(tamMem, pageSize, hw.mem);
         pm = new ProcessManager(mm);
         utils = new Utilities(hw, mm); // utilitários do sistema
 

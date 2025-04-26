@@ -1,13 +1,16 @@
 package system.os;
 
 import java.util.*;
+import system.hardware.Memory;
 import system.hardware.Word;
 
 public class MemoryManager {
     public boolean[] pages; //Se true, frame já está alocado
     private int pageSize;
+    private Memory mem; // Memória física
 
-    public MemoryManager(int tamMem, int pageSize) {
+    public MemoryManager(int tamMem, int pageSize, Memory mem) {
+        this.mem = mem; // Inicializa a memória
         // Verifica se o tamanho da página é divisor do tamanho da memória
         if (tamMem % pageSize != 0) {
             throw new IllegalArgumentException("O tamanho da página deve ser um divisor do tamanho da memória.");
@@ -43,7 +46,7 @@ public class MemoryManager {
                     break;
                 }
                 System.out.println("Alocando palavra " + wordIndex + " na página " + i);
-                p[startAddress + offset] = new Word(
+                mem.pos[startAddress + offset] = new Word(
                         p[wordIndex].opc,
                         p[wordIndex].ra,
                         p[wordIndex].rb,
