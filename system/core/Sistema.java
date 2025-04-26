@@ -20,7 +20,7 @@ public class Sistema {
     public void run() {
 
         //so.utils.loadAndExec(progs.retrieveProgram("fatorialV2"));
-        Commands cmds = new Commands(progs, so);
+        Commands cmds = new Commands(progs, this);
 
         cmds.waitForCommands();
 
