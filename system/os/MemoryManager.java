@@ -68,17 +68,12 @@ public class MemoryManager {
         throw new OutOfMemoryError("Não há memória suficiente para alocar o programa.");
     }
 
-    // não limpa as palavras (memoria sera sobrescrita)
-    public List<Integer> jmFree(Map<Integer, Integer> pageTable) {
-        List<Integer> freedFrames = new ArrayList<>(); // Lista para armazenar os frames desalocados
-
-        for (int frame : pageTable.values()) { // Itera sobre os frames físicos na tabela de páginas
-            if (frame >= 0 && frame < pages.length && pages[frame]) { // Verifica se o frame é válido e está alocado
+    public boolean jmFree(int[] pageTable) {
+        for (int frame : pageTable) {
+            if (frame >= 0 && frame < pages.length) {
                 pages[frame] = false; // Marca o frame como livre
-                freedFrames.add(frame); // Adiciona o frame à lista de desalocados
             }
         }
-
-        return freedFrames; // Retorna os frames desalocados
+        return true; // Retorna sempre true
     }
 }
