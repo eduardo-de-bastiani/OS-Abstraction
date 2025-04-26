@@ -76,9 +76,9 @@ public class Commands {
             return;
         }
         try {
-            boolean ok = sys.so.pm.createProcess(new Program(name, image));
-            if (ok) {
-                System.out.println("Processo criado com sucesso: " + name);
+            PCB ok = sys.so.pm.createProcess(new Program(name, image));
+            if (ok != null) {
+                System.out.println("Processo " + name + " criado com sucesso com pid " + ok.pid);
             }
         } catch (OutOfMemoryError e) {
             System.out.println("Erro ao criar processo: memória insuficiente.");
@@ -174,14 +174,18 @@ public class Commands {
             return;
         }
         try {
-            int pid = Integer.parseInt(args[0]);
-            PCB pcb = findPCB(pid);
-            if (pcb == null) {
-                System.out.println("Processo não encontrado: " + pid);
-                return;
-            }
-            Word[] image = progs.retrieveProgram(pcb.programName);
-            sys.so.utils.loadAndExec(image);
+            // int pid = Integer.parseInt(args[0]);
+            // PCB pcb = findPCB(pid);
+            // if (pcb == null) {
+            //     System.out.println("Processo não encontrado: " + pid);
+            //     return;
+            // }
+            // Word[] image = progs.retrieveProgram(pcb.programName);
+            // sys.so.utils.loadAndExec(image);
+
+            sys.hw.cpu.setContext(0); // seta pc para endereço 0 - ponto de entrada dos programas
+            System.out.println("---------------------------------- inicia execucao ");
+            sys.hw.cpu.run(); // cpu roda programa ate parar
         } catch (NumberFormatException e) {
             System.out.println("PID inválido: " + args[0]);
         }

@@ -16,12 +16,12 @@ public class ProcessManager {
         this.memoryManager = mm;
     }
 
-    public boolean createProcess(Program p) {
+    public PCB createProcess(Program p) {
         int[] pageTable = memoryManager.jmAlloc(p.image);
         idCounter++;
         PCB pcb = new PCB(idCounter, pageTable, p.name);
         processReady.add(pcb);
-        return true;
+        return pcb;
     }
 
     public void removeProcess(int id){

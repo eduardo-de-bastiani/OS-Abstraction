@@ -42,6 +42,7 @@ public class MemoryManager {
                 if (wordIndex >= qtdWords) {
                     break;
                 }
+                System.out.println("Alocando palavra " + wordIndex + " na página " + i);
                 p[startAddress + offset] = new Word(
                         p[wordIndex].opc,
                         p[wordIndex].ra,
