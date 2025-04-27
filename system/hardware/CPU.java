@@ -2,6 +2,7 @@ package system.hardware;
 
 import system.os.InterruptHandling;
 import system.os.Interrupts;
+import system.os.MemoryManager;
 import system.os.SysCallHandling;
 import system.software.Opcode;
 import system.utils.Utilities;
@@ -30,6 +31,7 @@ public class CPU {
     // auxilio aa depuração
     private boolean debug; // se true entao mostra cada instrucao em execucao
     private Utilities u; // para debug (dump)
+    public MemoryManager mm; 
 
     public CPU(Memory _mem, boolean _debug) { // ref a MEMORIA passada na criacao da CPU
         maxInt = 32767; // capacidade de representacao modelada
@@ -115,35 +117,38 @@ public class CPU {
                         pc++;
                         break;
                     case LDD: // Rd <- [A]
-                        if (legal(ir.p)) {
-                            reg[ir.ra] = m[ir.p].p;
+                        int enderecoFisicoLDD = mm.mmu(ir.p);
+                        if (legal(enderecoFisicoLDD)) {
+                            reg[ir.ra] = m[enderecoFisicoLDD].p;
                             pc++;
                         }
                         break;
                     case LDX: // RD <- [RS] // NOVA
-                        if (legal(reg[ir.rb])) {
-                            reg[ir.ra] = m[reg[ir.rb]].p;
+                        int enderecoFisicoLDX = mm.mmu(reg[ir.rb]);
+                        if (legal(enderecoFisicoLDX)) {
+                            reg[ir.ra] = m[enderecoFisicoLDX].p;
                             pc++;
                         }
                         break;
                     case STD: // [A] ← Rs
-                        if (legal(ir.p)) {
-                            m[ir.p].opc = Opcode.DATA;
-                            m[ir.p].p = reg[ir.ra];
+                        int enderecoFisicoSTD = mm.mmu(ir.p);
+                        if (legal(enderecoFisicoSTD)) {
+                            m[enderecoFisicoSTD].opc = Opcode.DATA;
+                            m[enderecoFisicoSTD].p = reg[ir.ra];
                             pc++;
                             if (debug) {
                                 System.out.print("                                  ");
-                                u.dump(ir.p, ir.p + 1);
+                                u.dump(enderecoFisicoSTD, enderecoFisicoSTD + 1);
                             }
                         }
                         break;
                     case STX: // [Rd] ←Rs
-                        if (legal(reg[ir.ra])) {
-                            m[reg[ir.ra]].opc = Opcode.DATA;
-                            m[reg[ir.ra]].p = reg[ir.rb];
+                        int enderecoFisicoSTX = mm.mmu(reg[ir.ra]);
+                        if (legal(enderecoFisicoSTX)) {
+                            m[enderecoFisicoSTX].opc = Opcode.DATA;
+                            m[enderecoFisicoSTX].p = reg[ir.rb];
                             pc++;
                         }
-                        ;
                         break;
                     case MOVE: // RD <- RS
                         reg[ir.ra] = reg[ir.rb];
