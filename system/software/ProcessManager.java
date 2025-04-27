@@ -10,7 +10,8 @@ public class ProcessManager {
     public List<PCB> processReady = new ArrayList<>(); // lista de processos prontos
     public List<PCB> processBlocked = new ArrayList<>(); // lista de processos bloqueados
     private int idCounter = 0;
-    final MemoryManager memoryManager;
+    public MemoryManager memoryManager;
+    private Scalonator scalonator;
 
     private List<PCB> getAllProcesses() {
         List<PCB> all = new ArrayList<>();
@@ -19,14 +20,13 @@ public class ProcessManager {
         all.add(processRunning);
         return all;
     }
-
-    public ProcessManager(MemoryManager mm) {
-        this.memoryManager = mm;
+    public ProcessManager() {
+        this.scalonator = new Scalonator();
     }
 
     public boolean createProcess(Program p) {
-         int[] pageTable = memoryManager.jmAlloc(p.image);
-
+        int[] pageTable = memoryManager.aloca(p.image);
+        
         idCounter++;
         PCB pcb = new PCB(idCounter, pageTable, p.name);
     
@@ -82,9 +82,12 @@ public class ProcessManager {
         // }
 
 
-        // chamar metodo jmfree() com o map de pages do PCB que encontramos
-        //memoryManager.jmFree()
+        // chamar metodo desaloca() com o map de pages do PCB que encontramos
+        //memoryManager.desaloca()
 
-    //}
-    
+    }
+
+    public void scheduleNextProcess(Integer pid) {
+        processRunning = scalonator.scheduleProcess(processRunning, processReady, pid);
+    }
 }

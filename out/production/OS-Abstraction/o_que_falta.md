@@ -1,5 +1,5 @@
 - MemoryManager 
-    - trocar a saída do JmAlloc para lista de índices de 
+    - trocar a saída do aloca para lista de índices de 
 
 - ProcessManagery
     - terminar metodo removeProcess
