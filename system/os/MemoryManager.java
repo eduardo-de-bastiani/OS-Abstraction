@@ -3,13 +3,16 @@ package system.os;
 import java.util.*;
 import system.hardware.Memory;
 import system.hardware.Word;
+import system.software.ProcessManager;
 
 public class MemoryManager {
     public boolean[] pages; //Se true, frame já está alocado
     private int pageSize;
     private Memory mem; // Memória física
+    private ProcessManager pm; // Gerenciador de processos
 
-    public MemoryManager(int tamMem, int pageSize, Memory mem) {
+    public MemoryManager(int tamMem, int pageSize, Memory mem, ProcessManager pm) {
+        this.pm = pm; // Inicializa o gerenciador de processos
         this.mem = mem; // Inicializa a memória
         // Verifica se o tamanho da página é divisor do tamanho da memória
         if (tamMem % pageSize != 0) {
@@ -24,7 +27,7 @@ public class MemoryManager {
         this.pageSize = pageSize;
     }
  
-    public int[] jmAlloc(Word[] p) {
+    public int[] aloca(Word[] p) {
         int qtdWords = p.length; // Quantidade de palavras a serem alocadas
         int qtdPages = (int) Math.ceil((double) qtdWords / pageSize); // Calcula o número de páginas necessárias
         int[] allocatedPages = new int[qtdPages]; // Array para armazenar as páginas alocadas
@@ -68,12 +71,44 @@ public class MemoryManager {
         throw new OutOfMemoryError("Não há memória suficiente para alocar o programa.");
     }
 
-    public boolean jmFree(int[] pageTable) {
+    public void desaloca(int[] pageTable) {
         for (int frame : pageTable) {
             if (frame >= 0 && frame < pages.length) {
                 pages[frame] = false; // Marca o frame como livre
             }
         }
-        return true; // Retorna sempre true
+    }
+
+    public int mmu(int enderecoLogico) {
+        // Verifica se há um processo em execução no momento
+        if (pm.processRunning == null) {
+            throw new IllegalStateException("Nenhum processo está em execução no momento.");
+        }
+
+        // Obtém a tabela de páginas do processo em execução
+        int[] tabelaDePaginas = pm.processRunning.pageTable;
+
+        // Verifica se o endereço lógico está no range das tabelas alocadas
+        if (enderecoLogico < 0 || enderecoLogico >= tabelaDePaginas.length * pageSize) {
+            throw new IllegalArgumentException("Endereço lógico fora do intervalo das tabelas de páginas alocadas.");
+        }
+
+        // Calcula o índice da página e o deslocamento dentro da página
+        int indicePagina = enderecoLogico / pageSize;
+        int deslocamento = enderecoLogico % pageSize;
+
+        // Obtém o frame físico correspondente
+        int frameFisico = tabelaDePaginas[indicePagina];
+
+        // Verifica se o frame físico está no range da memória física
+        if (frameFisico < 0 || frameFisico >= pages.length) {
+            throw new IllegalArgumentException("Frame físico fora do intervalo da memória física.");
+        }
+
+        // Transforma o endereço lógico em endereço físico
+        int enderecoFisico = frameFisico * pageSize + deslocamento;
+
+        // Retorna o endereço físico
+        return enderecoFisico;
     }
 }
