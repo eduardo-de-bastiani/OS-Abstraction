@@ -170,16 +170,9 @@ public class Commands {
             return;
         }
         try {
-            // int pid = Integer.parseInt(args[0]);
-            // PCB pcb = findPCB(pid);
-            // if (pcb == null) {
-            //     System.out.println("Processo não encontrado: " + pid);
-            //     return;
-            // }
-            // Word[] image = progs.retrieveProgram(pcb.programName);
-            // sys.so.utils.loadAndExec(image);
-
-            sys.hw.cpu.setContext(0); // seta pc para endereço 0 - ponto de entrada dos programas
+            int pid = Integer.parseInt(args[0]);
+            sys.so.pm.scheduleNextProcess(pid);
+            sys.hw.cpu.setContext(sys.so.mm.mmu(0)); // seta pc para endereço físico calculado pelo MMU
             System.out.println("---------------------------------- inicia execucao ");
             sys.hw.cpu.run(); // cpu roda programa ate parar
         } catch (NumberFormatException e) {
