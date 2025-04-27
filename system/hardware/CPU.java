@@ -278,10 +278,9 @@ public class CPU {
 
                     case STOP: // por enquanto, para execucao
                         sysCall.stop();
-                        // sys.so.mm.desaloca(reg);(sys.so.pm.processRunning.pageTable);
+                        sys.so.pm.removeProcess(sys.so.pm.processRunning.pid);
                         cpuStop = true;
                         break;
-
                     // Inexistente
                     default:
                         System.out.println("Instrução inexistente: " + ir.opc);
@@ -290,6 +289,9 @@ public class CPU {
                 }
             }
             // --------------------------------------------------------------------------------------------------
+
+            //aumenta quantum
+
             // VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
             if (irpt != Interrupts.noInterrupt) { // existe interrupção
                 ih.handle(irpt); // desvia para rotina de tratamento - esta rotina é do SO

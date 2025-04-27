@@ -35,11 +35,11 @@
 
 2. Criação da Classe Scheduler
 
-    - Criar class Scheduler
+    - Criar class Scheduler ✅
 
     - No construtor, receber referência ao ProcessManager e ao semáforo de scheduler.
 
-    - Implementar o método RoundRobin
+    - Implementar o método RoundRobin 
         - Fica em loop infinito (while (true)), aguardando o semáforo do relógio
         - A cada liberação, dispara a rotina de troca de contexto
 
@@ -110,33 +110,29 @@ Duas abordagens:
     Escolher novo processo da fila de prontos e executar troca de contexto (pode chamar a mesma lógica de TIMER).
 
 
-7. Comando execAll
+7. Comando execAll -> o sor provavelmente vai querer ver essa execução!!
 
-    Adicionar em Sistema o comando execAll que:
+    - Adicionar em Sistema o comando execAll que:
 
         Verifica se existem processos na fila de prontos.
 
         Se sim, sinaliza a thread de escalonamento para iniciar o round-robin.
 
-    Exibir no console:
+    - Exibir no console:
 
         A cada quantum: qual PID saiu da CPU e qual entrou.
 
         Quando um processo termina: PID e status final.
 
 
-### Chaveamento de Contexto
-- na classe Sistema, instanciar semáforo de CPU e semáforo de Scheduler
-- criar classe de Scheduler (instanciado pelo SO)
-    - método roundRobin que é um while(true)
-        - podemos implementar o relógio como uma thread em loop que após o quantum de tempo, gera uma interrupção
-        - OU podemos implementar o relógio como um contador de ciclos da CPU
-- criar função de handle na classe InterruptHandling com switch case para lidar com escalonador
-    - switch case: tempo de RoundRobin, finalização de um processo e instrução inválida
-- criar rotina de tratamento da interrupção do RoundRobin (relógio)
-    1. salvar o contexto do processo (PC, registradores) em um campo no PCB
-    2. mudar o estado do processo de running para ready
-    3. escolher próximo processo a ser executado
-    4. mudar seu estado de ready para running
-    5. restaurar o contexto dele
-    6. faz tudo de novo (loop)
+8. Execução Contínua
+
+    - Modificar o loop principal de leitura de comandos de forma não-bloqueante:
+
+        A thread de escalonamento fica livre para disparar interrupts mesmo enquanto o usuário digita.
+
+    - Garantir sincronização entre:
+
+        Thread de comandos (criando/removendo PCBs).
+
+        Thread de escalonamento (acessando filas e semáforos).

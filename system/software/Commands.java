@@ -165,19 +165,8 @@ public class Commands {
     }
 
     private void cmdExec(String[] args) {
-        if (args.length < 1) {
-            System.out.println("Uso: exec <pid>");
-            return;
-        }
-        try {
-            int pid = Integer.parseInt(args[0]);
-            sys.so.pm.scheduleNextProcess(pid);
-            sys.hw.cpu.setContext(sys.so.mm.mmu(0)); // seta pc para endereço físico calculado pelo MMU
-            System.out.println("---------------------------------- inicia execucao ");
-            sys.hw.cpu.run(); // cpu roda programa ate parar
-        } catch (NumberFormatException e) {
-            System.out.println("PID inválido: " + args[0]);
-        }
+        sys.hw.cpu.run();
+        System.out.println("Todos os processos foram executados.");
     }
 
     private void cmdTraceOn() {
@@ -198,6 +187,7 @@ public class Commands {
         System.out.println("  dump <pid>          - exibe PCB e memória do processo");
         System.out.println("  dumpM <start> <end> - exibe memória do sistema entre posições");
         System.out.println("  exec <pid>          - executa o processo com o ID informado");
+        System.out.println("  execall             - executa todos os processos");
         System.out.println("  traceOn             - habilita modo de trace da CPU");
         System.out.println("  traceOff            - desabilita modo de trace da CPU");
         System.out.println("  help                - mostra esta ajuda");

@@ -88,7 +88,7 @@ public class MemoryManager {
         // Obtém a tabela de páginas do processo em execução
         int[] tabelaDePaginas = pm.processRunning.pageTable;
 
-        // Verifica se o endereço lógico está no range das tabelas alocadas
+        // Verifica se o endereço lógico está no range das tabelas alocadass
         if (enderecoLogico < 0 || enderecoLogico >= tabelaDePaginas.length * pageSize) {
             throw new IllegalArgumentException("Endereço lógico fora do intervalo das tabelas de páginas alocadas.");
         }

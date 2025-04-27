@@ -3,9 +3,26 @@ package system.software;
 import java.util.List;
 
 public class Scalonator {
-    public Scalonator() {
+
+    public final int QUANTUM_ROUNDS; // Quantidade de ciclos até gerar interrupção
+
+    public Scalonator(int quantumRounds) {
+        this.QUANTUM_ROUNDS = quantumRounds; // Inicializa a quantidade de ciclos
         // Inicialização do escalonador
         System.out.println("Scalonator inicializado.");
+    }
+
+    // Retona o processo para ser rodado
+    public PCB roundRobin(List<PCB> readyProcesses) {
+        if (readyProcesses.isEmpty()) {
+            System.out.println("Nenhum processo disponível na lista de prontos para escalonamento.");
+            return null; // Retorna null se não houver processos prontos
+        }
+
+        PCB nextProcess = readyProcesses.remove(0); // Remove o primeiro processo da fila de prontos
+        readyProcesses.add(nextProcess);
+
+        return nextProcess; // Retorna o processo que estava rodando
     }
 
     // Métodos do escalonador podem ser adicionados aqui

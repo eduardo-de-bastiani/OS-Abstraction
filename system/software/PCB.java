@@ -6,16 +6,9 @@ public class PCB {
     // public final int uid; // id do usuario que criou
     public int pc; // contador de programa
     public int[] reg = new int[10]; // registradores do processo, array de 10 posições
-    public int status; // status do processo (running, ready, blocked) podemos realizar um ENUM
-    public int priority;
     public int[] pageTable; // Alterado de Map para array de inteiros
     public String programName;  // nome do processo (programa)
     // public boolean allowInterrupt = true;
-
-    // de alguma forma adicionar evento que o processo está
-    // depois teremos que adicionar comunicação entre
-    // informações de tempo executando e aguardando
-    // recursos controlados pelo processo, como arquivos abertos
 
     public PCB(int _pid, int[] _pageTable, String _name) { // Alterado o tipo de _pageTable para int[]
         pid = _pid;
@@ -24,8 +17,19 @@ public class PCB {
             reg[i] = 0;
         }
         pageTable = _pageTable; // Atribuição direta do array
-        status = 1; // 0 = running, 1 = ready, 2 = blocked
-        priority = 0; // prioridade do processo
         programName = _name;
+    }
+
+    private void saveRegisters(int[] _reg) {
+        reg = _reg.clone();
+    }
+
+    private void savePC(int _pc) {
+        pc = _pc;
+    }
+
+    public void saveContext(int[] _reg, int _pc) {
+        saveRegisters(_reg);
+        savePC(_pc);
     }
 }

@@ -11,7 +11,6 @@ public class InterruptHandling {
 
     public void handle(Interrupts irpt) {
         // apenas avisa - todas interrupcoes neste momento finalizam o programa
-        System.out.println(
-                "                                               Interrupcao " + irpt + "   pc: " + hw.cpu.pc);
+        System.out.println("Interrupcao " + irpt + "   pc: " + hw.cpu.pc);
     }
 }

@@ -11,8 +11,9 @@ public class ProcessManager {
     public List<PCB> processBlocked = new ArrayList<>(); // lista de processos bloqueados
     private int idCounter = 0;
     public MemoryManager memoryManager;
-    private Scalonator scalonator;
+    public Scalonator scalonator;
 
+    //retorna a juncao de todas as listas de processos (bloqueando, pronto e rodando)
     private List<PCB> getAllProcesses() {
         List<PCB> all = new ArrayList<>();
         all.addAll(processReady);
@@ -20,8 +21,9 @@ public class ProcessManager {
         all.add(processRunning);
         return all;
     }
-    public ProcessManager() {
-        this.scalonator = new Scalonator();
+    
+    public ProcessManager(int quantum) {
+        this.scalonator = new Scalonator(quantum);
     }
 
     public boolean createProcess(Program p) {
@@ -64,6 +66,6 @@ public class ProcessManager {
     }
 
     public void scheduleNextProcess(Integer pid) {
-        processRunning = scalonator.scheduleProcess(processRunning, processReady, pid);
+        this.processRunning = scalonator.roundRobin(processReady);
     }
 }
