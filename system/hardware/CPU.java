@@ -278,8 +278,8 @@ public class CPU {
 
                     case STOP: // por enquanto, para execucao
                         sysCall.stop();
-                        //sys.so.mm.jmFree(sys.so.pm.processRunning.pageTable);
-                        //cpuStop = true;
+                        // sys.so.mm.desaloca(reg);(sys.so.pm.processRunning.pageTable);
+                        cpuStop = true;
                         break;
 
                     // Inexistente

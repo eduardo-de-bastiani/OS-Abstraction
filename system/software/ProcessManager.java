@@ -36,55 +36,31 @@ public class ProcessManager {
         return true;
     }
 
-    public boolean removeProcess(int id) {
-        PCB pcb = getAllProcesses().get(id);
+    public boolean removeProcess(int pid) {
+        PCB pcb = getAllProcesses().stream()
+                .filter(p -> p.pid == pid)
+                .findFirst()
+                .orElse(null);
 
         if (pcb == null) {
-            System.out.println("PID " + id + " não encontrado.");
+            System.out.println("PID " + pid + " não encontrado.");
             return false;
         }
         
         // 1) liberar memória
-        memoryManager.jmFree(pcb.pageTable);
+        memoryManager.desaloca(pcb.pageTable);
 
         // 2) retirar de filas de ready e blocked
-        processReady.removeIf(p -> p.pid == id);
-        processBlocked.removeIf(p -> p.pid == id);
+        processReady.removeIf(p -> p.pid == pid);
+        processBlocked.removeIf(p -> p.pid == pid);
 
         // 3) se for o que está rodando, encerra-o
-        if (processRunning != null && processRunning.pid == id) {
+        if (processRunning != null && processRunning.pid == pid) {
             processRunning = null;
         }
         
-
-        System.out.println("Processo PID " + id + " removido com sucesso.");
+        System.out.println("Processo PID " + pid + " removido com sucesso.");
         return true;
-    }
-
-    //public void removeProcess(int id){
-
-
-
-        // // iterar sobre lista de processos prontos e remover o PCB == id
-        // for(int i = 0; i < processReady.size(); i++){
-        //     if(id == processReady.get(i).pid){
-        //         processReady.remove(i);
-        //         break;
-        //     }
-        // }
-
-        // // iterar sobre lista de processos bloqueados e remover o PCB == id
-        // for(int i = 0; i < processBlocked.size(); i++){
-        //     if(id == processBlocked.get(i).pid){
-        //         processBlocked.remove(i);
-        //         break;
-        //     }
-        // }
-
-
-        // chamar metodo desaloca() com o map de pages do PCB que encontramos
-        //memoryManager.desaloca()
-
     }
 
     public void scheduleNextProcess(Integer pid) {
