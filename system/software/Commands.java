@@ -89,7 +89,7 @@ public class Commands {
         try {
             int pid = Integer.parseInt(args[0]);
             sys.so.pm.removeProcess(pid);
-            System.out.println("Processo " + pid + " removido do sistema.");
+            //System.out.println("Processo " + pid + " removido do sistema.");
         } catch (NumberFormatException e) {
             System.out.println("PID inválido: " + args[0]);
         }

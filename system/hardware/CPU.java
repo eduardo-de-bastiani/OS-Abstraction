@@ -5,6 +5,7 @@ import system.os.Interrupts;
 import system.os.SysCallHandling;
 import system.software.Opcode;
 import system.utils.Utilities;
+import system.core.Sistema;
 
 public class CPU {
     private int maxInt; // valores maximo e minimo para inteiros nesta cpu
@@ -28,10 +29,12 @@ public class CPU {
     // nesta versao acaba o sistema no fim do prog
 
     // auxilio aa depuração
+    private Sistema sys;
     private boolean debug; // se true entao mostra cada instrucao em execucao
     private Utilities u; // para debug (dump)
 
-    public CPU(Memory _mem, boolean _debug) { // ref a MEMORIA passada na criacao da CPU
+    public CPU(Memory _mem, boolean _debug, Sistema sys) { // ref a MEMORIA passada na criacao da CPU
+        this.sys = sys; // ref ao sistema
         maxInt = 32767; // capacidade de representacao modelada
         minInt = -32767; // se exceder deve gerar interrupcao de overflow
         m = _mem.pos; // usa o atributo 'm' para acessar a memoria, só para ficar mais pratico
@@ -270,7 +273,8 @@ public class CPU {
 
                     case STOP: // por enquanto, para execucao
                         sysCall.stop();
-                        cpuStop = true;
+                        //sys.so.mm.jmFree(sys.so.pm.processRunning.pageTable);
+                        //cpuStop = true;
                         break;
 
                     // Inexistente

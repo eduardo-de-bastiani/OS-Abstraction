@@ -11,7 +11,7 @@ public class Sistema {
     public Programs progs;
 
     public Sistema(int tamMem, int pageSize) {
-        hw = new HW(tamMem); // memoria do HW tem tamMem palavras
+        hw = new HW(tamMem, this); // memoria do HW tem tamMem palavras
         so = new SO(hw, tamMem, pageSize);
         hw.cpu.setUtilities(so.utils); // permite cpu fazer dump de memoria ao avancar
         progs = new Programs();
