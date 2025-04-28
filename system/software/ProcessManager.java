@@ -66,6 +66,6 @@ public class ProcessManager {
 
     public void setFirstProcessRunning() {
         // TODO alterar para chamar o scheduler
-        this.processRunning = processReady.remove(0); // remove o primeiro da lista de prontos
+        this.processRunning = processReady.removeFirst(); // remove o primeiro da lista de prontos
     }
 }

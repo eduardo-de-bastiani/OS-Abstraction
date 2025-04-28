@@ -1,5 +1,8 @@
 package system.software;
 
+import system.core.Sistema;
+import system.hardware.HW;
+
 public class Scheduler implements Runnable {
 
     public final int QUANTUM_ROUNDS; // Quantidade de ciclos até gerar interrupção
@@ -44,6 +47,53 @@ public class Scheduler implements Runnable {
     public void quantumCompleted() {
         quantumCounter = 0; // Reinicia o contador de quanta
     }
+
+    public void handleStopInterrupt(HW hw){
+        //zerar o quantum counter do scheduler
+        this.quantumCompleted();
+
+        //remove o processo em execução
+        hw.sistema.so.pm.removeProcess(hw.sistema.so.pm.processRunning.pid);
+
+        //chama o scheduler para pegar o próximo processo
+        if (!hw.sistema.so.pm.processReady.isEmpty()) {
+            PCB proximoProcesso = hw.sistema.so.pm.processReady.removeFirst();
+            hw.sistema.so.pm.processRunning = proximoProcesso;
+            hw.cpu.pc = proximoProcesso.pc;
+            hw.cpu.reg = proximoProcesso.reg.clone();
+        } else {
+            // Se não houver mais processos prontos, parar a CPU
+            hw.cpu.cpuStop = true;
+        }
+    }
+
+    public void handleQuantumInterrupt(HW hw){
+        // Obter o sistema a partir do hardware
+        Sistema sistema = hw.sistema;
+
+        // Atualizar o PCB do processo em execução com o contexto da CPU
+        PCB processoAtual = sistema.so.pm.processRunning;
+        if (processoAtual != null) {
+            processoAtual.saveContext(hw.cpu.reg, hw.cpu.pc);
+            // Mover o processo em execução para o final da lista de prontos
+            sistema.so.pm.processReady.add(processoAtual);
+        }
+
+        // Selecionar o próximo processo da lista de prontos para execução
+        PCB proximoProcesso = sistema.so.pm.processReady.removeFirst();
+        if (proximoProcesso != null) {
+            // Atualizar a CPU com o contexto do próximo processo
+            hw.cpu.pc = proximoProcesso.pc;
+            hw.cpu.reg = proximoProcesso.reg.clone();
+
+            // Definir o próximo processo como o processo em execução
+            sistema.so.pm.processRunning = proximoProcesso;
+        }
+        //printa o processo em execução
+        System.out.println("Processo em execução: " + sistema.so.pm.processRunning.pid + " - " + sistema.so.pm.processRunning.programName);
+    }
+
+    //ToDO: handleInvalidInstructionInterrupt(HW hw)
 
 }
 
