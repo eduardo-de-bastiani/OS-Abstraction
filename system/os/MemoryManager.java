@@ -7,7 +7,7 @@ import system.software.ProcessManager;
 
 public class MemoryManager {
     public boolean[] pages; //Se true, frame já está alocado
-    private int pageSize;
+    public int pageSize;
     private Memory mem; // Memória física
     private ProcessManager pm; // Gerenciador de processos
 

@@ -167,6 +167,9 @@ public class Commands {
     private void cmdExec(String[] args) {
         sys.so.pm.setFirstProcessRunning();
         sys.hw.cpu.setContext(0);
+        for (int i = 0; i < sys.hw.cpu.reg.length; i++) {
+            sys.hw.cpu.reg[i] = 0;
+        }
         sys.hw.cpu.run();
         System.out.println("Todos os processos foram executados.");
     }
@@ -188,8 +191,8 @@ public class Commands {
         System.out.println("  ps                  - lista processos existentes");
         System.out.println("  dump <pid>          - exibe PCB e memória do processo");
         System.out.println("  dumpM <start> <end> - exibe memória do sistema entre posições");
-        System.out.println("  exec <pid>          - executa o processo com o ID informado");
-        System.out.println("  execall             - executa todos os processos");
+        //nao conseguimos implementar exec <pid> a tempo
+        System.out.println("  exec                - executa todos os processos");
         System.out.println("  traceOn             - habilita modo de trace da CPU");
         System.out.println("  traceOff            - desabilita modo de trace da CPU");
         System.out.println("  help                - mostra esta ajuda");

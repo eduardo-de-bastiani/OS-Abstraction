@@ -10,9 +10,9 @@ public class PCB {
     public String programName;  // nome do processo (programa)
     // public boolean allowInterrupt = true;
 
-    public PCB(int _pid, int[] _pageTable, String _name) { // Alterado o tipo de _pageTable para int[]
+    public PCB(int _pid, int[] _pageTable, String _name, int pageSize) { // Alterado o tipo de _pageTable para int[]
         pid = _pid;
-        pc = 0;
+        this.pc = _pageTable[0] * pageSize; // Inicializa o contador de programa com o primeiro elemento da tabela de páginas
         for (int i = 0; i < reg.length; i++) {
             reg[i] = 0;
         }
@@ -21,6 +21,9 @@ public class PCB {
     }
 
     private void saveRegisters(int[] _reg) {
+        for (int i = 0; i < reg.length; i++) {
+            System.out.println("Saving register " + i + ": " + _reg[i]);
+        }
         reg = _reg.clone();
     }
 

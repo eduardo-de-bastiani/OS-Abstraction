@@ -29,7 +29,7 @@ public class ProcessManager {
         int[] pageTable = memoryManager.aloca(p.image);
         
         idCounter++;
-        PCB pcb = new PCB(idCounter, pageTable, p.name);
+        PCB pcb = new PCB(idCounter, pageTable, p.name, memoryManager.pageSize);
     
         processReady.add(pcb);
 
