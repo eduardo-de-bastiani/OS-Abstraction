@@ -37,9 +37,8 @@
 
     - Criar class Scheduler ✅
 
-    - No construtor, receber referência ao ProcessManager e ao semáforo de scheduler.
-
     - Implementar o método RoundRobin 
+    
         - Fica em loop infinito (while (true)), aguardando o semáforo do relógio
         - A cada liberação, dispara a rotina de troca de contexto
 

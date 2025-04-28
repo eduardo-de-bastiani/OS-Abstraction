@@ -165,6 +165,8 @@ public class Commands {
     }
 
     private void cmdExec(String[] args) {
+        sys.so.pm.setFirstProcessRunning();
+        sys.hw.cpu.setContext(0);
         sys.hw.cpu.run();
         System.out.println("Todos os processos foram executados.");
     }

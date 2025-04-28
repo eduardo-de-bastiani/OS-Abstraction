@@ -1,14 +1,15 @@
 package system.hardware;
 
+import system.core.Sistema;
 import system.os.InterruptHandling;
 import system.os.Interrupts;
 import system.os.MemoryManager;
 import system.os.SysCallHandling;
 import system.software.Opcode;
+import system.software.Scheduler;
 import system.utils.Utilities;
-import system.core.Sistema;
 
-public class CPU {
+public class CPU implements Runnable {
     private int maxInt; // valores maximo e minimo para inteiros nesta cpu
     private int minInt;
     // CONTEXTO da CPU ...
@@ -25,7 +26,7 @@ public class CPU {
     private InterruptHandling ih; // significa desvio para rotinas de tratamento de Int - se int ligada, desvia
     private SysCallHandling sysCall; // significa desvio para tratamento de chamadas de sistema
 
-    private boolean cpuStop; // flag para parar CPU - caso de interrupcao que acaba o processo, ou chamada
+    public boolean cpuStop; // flag para parar CPU - caso de interrupcao que acaba o processo, ou chamada
     // stop -
     // nesta versao acaba o sistema no fim do prog
 
@@ -34,16 +35,15 @@ public class CPU {
     private boolean debug; // se true entao mostra cada instrucao em execucao
     private Utilities u; // para debug (dump)
     public MemoryManager mm; 
+    public Scheduler scheduler;
 
-    public CPU(Memory _mem, boolean _debug, Sistema sys) { // ref a MEMORIA passada na criacao da CPU
-        this.sys = sys; // ref ao sistema
-        maxInt = 32767; // capacidade de representacao modelada
-        minInt = -32767; // se exceder deve gerar interrupcao de overflow
-        m = _mem.pos; // usa o atributo 'm' para acessar a memoria, só para ficar mais pratico
-        reg = new int[10]; // aloca o espaço dos registradores - regs 8 e 9 usados somente para IO
-
-        debug = _debug; // se true, print da instrucao em execucao
-
+    public CPU(Memory _mem, boolean _debug, Sistema sys) {
+        this.sys = sys;
+        maxInt = 32767;
+        minInt = -32767;
+        m = _mem.pos;
+        reg = new int[10];
+        debug = _debug;
     }
 
     // TODO: implementar TLB (Translation Lookaside Buffer)
@@ -84,24 +84,17 @@ public class CPU {
         irpt = Interrupts.noInterrupt; // reset da interrupcao registrada
     }
 
-    public void run() { // execucao da CPU supoe que o contexto da CPU, vide acima,
-        // esta devidamente setado
+    @Override
+    public void run() {
         cpuStop = false;
-        while (!cpuStop) { // ciclo de instrucoes. acaba cfe resultado da exec da instrucao, veja cada
-            // caso.
-
-            // --------------------------------------------------------------------------------------------------
-            // FASE DE FETCH
-            if (legal(pc)) { // pc valido
-                ir = m[pc]; // <<<<<<<<<<<< AQUI faz FETCH - busca posicao da memoria apontada por pc,
-                // guarda em ir
-                // resto é dump de debug
+        while (!cpuStop) {
+            if (legal(pc)) {
+                ir = m[pc];
                 if (debug) {
                     System.out.print("                                              regs: ");
                     for (int i = 0; i < 10; i++) {
                         System.out.print(" r[" + i + "]:" + reg[i]);
                     }
-                    ;
                     System.out.println();
                 }
                 if (debug) {
@@ -109,17 +102,12 @@ public class CPU {
                     u.dump(ir);
                 }
 
-                // --------------------------------------------------------------------------------------------------
-                // FASE DE EXECUCAO DA INSTRUCAO CARREGADA NO ir
-                switch (ir.opc) { // conforme o opcode (código de operação) executa
-
-                    // Instrucoes de Busca e Armazenamento em Memoria
-                    case LDI: // Rd ← k veja a tabela de instrucoes do HW simulado para entender a semantica
-                        // da instrucao
+                switch (ir.opc) {
+                    case LDI:
                         reg[ir.ra] = ir.p;
                         pc++;
                         break;
-                    case LDD: // Rd <- [A]
+                    case LDD:
                         int enderecoFisicoLDD = mm.mmu(ir.p);
                         if (legal(enderecoFisicoLDD)) {
                             reg[ir.ra] = m[enderecoFisicoLDD].p;
@@ -278,8 +266,7 @@ public class CPU {
 
                     case STOP: // por enquanto, para execucao
                         sysCall.stop();
-                        sys.so.pm.removeProcess(sys.so.pm.processRunning.pid);
-                        cpuStop = true;
+                        irpt = Interrupts.intSTOP;
                         break;
                     // Inexistente
                     default:
@@ -288,15 +275,19 @@ public class CPU {
                         break;
                 }
             }
-            // --------------------------------------------------------------------------------------------------
 
-            //aumenta quantum
-
-            // VERIFICA INTERRUPÇÃO !!! - TERCEIRA FASE DO CICLO DE INSTRUÇÕES
-            if (irpt != Interrupts.noInterrupt) { // existe interrupção
-                ih.handle(irpt); // desvia para rotina de tratamento - esta rotina é do SO
-                cpuStop = true; // nesta versao, para a CPU
+            if (scheduler.notifyInstructionExecuted()){
+                // Se o quantum foi completado, gera uma interrupção
+                irpt = Interrupts.quantumTime;
             }
-        } // FIM DO CICLO DE UMA INSTRUÇÃO
+
+            if (irpt != Interrupts.noInterrupt) {
+                ih.handle(irpt);
+                irpt = Interrupts.noInterrupt; // reset da interrupcao
+            }
+
+        
+
+        }
     }
 }

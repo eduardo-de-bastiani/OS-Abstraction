@@ -2,7 +2,7 @@ package system.os;
 
 import system.hardware.HW;
 import system.software.ProcessManager;
-import system.software.Scalonator;
+import system.software.Scheduler;
 import system.utils.Utilities;
 
 public class SO {
@@ -11,14 +11,14 @@ public class SO {
     public Utilities utils;
     public MemoryManager mm; 
     public ProcessManager pm;
-    public Scalonator sca;
-
+    public Scheduler sca;
+    
     public SO(HW hw, int tamMem, int pageSize, int quantum) {
         ih = new InterruptHandling(hw); // rotinas de tratamento de int
         sc = new SysCallHandling(hw); // chamadas de sistema
         hw.cpu.setAddressOfHandlers(ih, sc);
         pm = new ProcessManager(quantum);
-        sca = pm.scalonator;
+        sca = pm.Scheduler;
         mm = new MemoryManager(tamMem, pageSize, hw.mem, pm);
         pm.memoryManager = mm; // gerenciador de processos tem acesso ao mm
         utils = new Utilities(hw, mm); // utilitários do sistema

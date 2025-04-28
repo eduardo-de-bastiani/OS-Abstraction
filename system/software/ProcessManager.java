@@ -2,7 +2,6 @@ package system.software;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import system.os.MemoryManager;
 
 public class ProcessManager {
@@ -11,7 +10,7 @@ public class ProcessManager {
     public List<PCB> processBlocked = new ArrayList<>(); // lista de processos bloqueados
     private int idCounter = 0;
     public MemoryManager memoryManager;
-    public Scalonator scalonator;
+    public Scheduler Scheduler;
 
     //retorna a juncao de todas as listas de processos (bloqueando, pronto e rodando)
     private List<PCB> getAllProcesses() {
@@ -23,7 +22,7 @@ public class ProcessManager {
     }
     
     public ProcessManager(int quantum) {
-        this.scalonator = new Scalonator(quantum);
+        this.Scheduler = new Scheduler(quantum);
     }
 
     public boolean createProcess(Program p) {
@@ -65,7 +64,8 @@ public class ProcessManager {
         return true;
     }
 
-    public void scheduleNextProcess(Integer pid) {
-        this.processRunning = scalonator.roundRobin(processReady);
+    public void setFirstProcessRunning() {
+        // TODO alterar para chamar o scheduler
+        this.processRunning = processReady.remove(0); // remove o primeiro da lista de prontos
     }
 }
