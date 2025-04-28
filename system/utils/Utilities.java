@@ -1,8 +1,8 @@
 package system.utils;
 
-import system.os.MemoryManager;
 import system.hardware.HW;
 import system.hardware.Word;
+import system.os.MemoryManager;
 
 public class Utilities {
     private HW hw;

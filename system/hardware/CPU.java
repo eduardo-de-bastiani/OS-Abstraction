@@ -58,6 +58,14 @@ public class CPU implements Runnable {
         u = _u; // aponta para rotinas utilitárias - fazer dump da memória na tela
     }
 
+    //TODO: isso
+    // private boolean isLogicAdressValid(int e) { // verifica se o endereco é valido
+    //     for (int page : sys.so.pm.processRunning.pageTable) {
+    //         se e ta aq entao retorna true
+    //     }
+    //     return false;
+    // }
+
     // verificação de enderecamento
     private boolean legal(int e) { // todo acesso a memoria tem que ser verificado se é válido -
         // aqui no caso se o endereco é um endereco valido em toda memoria
