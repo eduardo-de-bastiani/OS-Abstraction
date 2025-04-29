@@ -27,6 +27,7 @@ public class Commands {
         commands.put("dump",     this::cmdDump);
         commands.put("dumpM",    this::cmdDumpM);
         commands.put("exec",     this::cmdExec);
+        commands.put("execLoop",     this::cmdExecLoop);
         commands.put("traceOn",  args -> cmdTraceOn());
         commands.put("traceOff", args -> cmdTraceOff());
         commands.put("help",     args -> cmdHelp());
@@ -170,8 +171,29 @@ public class Commands {
         for (int i = 0; i < sys.hw.cpu.reg.length; i++) {
             sys.hw.cpu.reg[i] = 0;
         }
+        
         sys.hw.cpu.run();
         System.out.println("Todos os processos foram executados.");
+    }
+
+    private void cmdExecLoop(String[] args) {
+        sys.so.pm.setFirstProcessRunning();
+        sys.hw.cpu.setContext(0);
+        for (int i = 0; i < sys.hw.cpu.reg.length; i++) {
+            sys.hw.cpu.reg[i] = 0;
+        }
+        
+        new Thread(() -> {
+            try {
+                sys.hw.cpu.waitOnInstruction = true;
+                sys.hw.cpu.run();
+                sys.hw.cpu.waitOnInstruction = false;
+            } catch (Exception e) {
+                System.out.println("Erro ao executar processo: " + e.getMessage());
+            }
+        }).start();
+
+        System.out.println("Processos estão sendo executados em paralelo.");
     }
 
     private void cmdTraceOn() {

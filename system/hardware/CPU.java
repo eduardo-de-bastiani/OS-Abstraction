@@ -30,6 +30,8 @@ public class CPU implements Runnable {
     // stop -
     // nesta versao acaba o sistema no fim do prog
 
+    public boolean waitOnInstruction; // flag para esperar após cada instrução
+
     // auxilio aa depuração
     private Sistema sys;
     private boolean debug; // se true entao mostra cada instrucao em execucao
@@ -295,7 +297,13 @@ public class CPU implements Runnable {
             }
 
         
-
+            if (waitOnInstruction) {
+                try {
+                    Thread.sleep(1000); // espera 1 segundo entre as instruções
+                } catch (InterruptedException e) {
+                    System.out.println("Erro ao pausar a execução: " + e.getMessage());
+                }
+            }
         }
     }
 }
