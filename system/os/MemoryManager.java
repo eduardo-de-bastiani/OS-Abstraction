@@ -35,7 +35,12 @@ public class MemoryManager {
 
         // Percorre as páginas disponíveis para encontrar espaço usando "first fit"
         for (int i = 0; i < pages.length; i++) {
-            if (pages[i]) continue; // Página indisponível
+            if (pages[i]) { // Página indisponível
+                System.out.println("Página " + i + " indisponível");
+                continue;
+            };
+
+            System.out.println("Alocando página " + i + " na memória.");
 
             pages[i] = true; // Marca a página como alocada
             allocatedPages[allocatedCount] = i; // Armazena a página alocada
@@ -48,7 +53,6 @@ public class MemoryManager {
                 if (wordIndex >= qtdWords) {
                     break;
                 }
-                System.out.println("Alocando palavra " + wordIndex + " na página " + i);
                 mem.pos[startAddress + offset] = new Word(
                         p[wordIndex].opc,
                         p[wordIndex].ra,
@@ -56,18 +60,17 @@ public class MemoryManager {
                         p[wordIndex].p);
             }
 
-            // Verifica se todas as palavras foram alocadas
+            // Verifica se todas as páginas foram alocadas
             if (allocatedCount == qtdPages) {
                 return allocatedPages; // Retorna o array de páginas alocadas
-            } else {
-                // Se não foi possível alocar todas as páginas, desaloca as páginas alocadas
-                for (int j = 0; j < allocatedCount; j++) {
-                    pages[allocatedPages[j]] = false; // Marca a página como livre
-                }
             }
         }
 
-        // Caso não seja possível alocar todas as páginas, lança uma exceção
+        // Se não foi possível alocar todas as páginas, desaloca as páginas alocadas
+        for (int j = 0; j < allocatedCount; j++) {
+            pages[allocatedPages[j]] = false; // Marca a página como livre
+        }
+
         throw new OutOfMemoryError("Não há memória suficiente para alocar o programa.");
     }
 
@@ -75,6 +78,8 @@ public class MemoryManager {
         for (int frame : pageTable) {
             if (frame >= 0 && frame < pages.length) {
                 pages[frame] = false; // Marca o frame como livre
+
+                System.out.println("Desalocando página " + frame + " da memória.");
             }
         }
     }
@@ -90,7 +95,9 @@ public class MemoryManager {
 
         // Verifica se o endereço lógico está no range das tabelas alocadass
         if (enderecoLogico < 0 || enderecoLogico >= tabelaDePaginas.length * pageSize) {
-            throw new IllegalArgumentException("Endereço lógico fora do intervalo das tabelas de páginas alocadas.");
+            throw new IllegalArgumentException(
+                "Endereço lógico " + enderecoLogico + " fora do intervalo das tabelas de páginas alocadas (" + (tabelaDePaginas.length * pageSize) + ")"
+                );
         }
 
         // Calcula o índice da página e o deslocamento dentro da página
