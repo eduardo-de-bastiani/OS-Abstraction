@@ -99,7 +99,7 @@ public class CPU implements Runnable {
         cpuStop = false;
         while (!cpuStop) {
             if (legal(pc)) {
-                ir = m[pc];
+                ir = m[mm.mmu(pc)];
                 if (debug) {
                     System.out.print("                                              regs: ");
                     for (int i = 0; i < 10; i++) {

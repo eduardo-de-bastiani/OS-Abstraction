@@ -12,7 +12,7 @@ public class PCB {
 
     public PCB(int _pid, int[] _pageTable, String _name, int pageSize) { // Alterado o tipo de _pageTable para int[]
         pid = _pid;
-        this.pc = _pageTable[0] * pageSize; // Inicializa o contador de programa com o primeiro elemento da tabela de páginas
+        this.pc = 0;
         for (int i = 0; i < reg.length; i++) {
             reg[i] = 0;
         }
