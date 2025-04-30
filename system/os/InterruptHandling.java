@@ -1,8 +1,6 @@
 package system.os;
 
-import system.core.Sistema;
 import system.hardware.HW;
-import system.software.PCB;
 
 public class InterruptHandling {
     private HW hw; // referencia ao hw se tiver que setar algo
