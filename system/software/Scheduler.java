@@ -57,7 +57,7 @@ public class Scheduler implements Runnable {
 
         //chama o scheduler para pegar o próximo processo
         if (!hw.sistema.so.pm.processReady.isEmpty()) {
-            PCB proximoProcesso = hw.sistema.so.pm.processReady.removeFirst();
+            PCB proximoProcesso = hw.sistema.so.pm.processReady.remove(0);
             hw.sistema.so.pm.processRunning = proximoProcesso;
             hw.cpu.pc = proximoProcesso.pc;
             hw.cpu.reg = proximoProcesso.reg.clone();
@@ -80,7 +80,7 @@ public class Scheduler implements Runnable {
         }
 
         // Selecionar o próximo processo da lista de prontos para execução
-        PCB proximoProcesso = sistema.so.pm.processReady.removeFirst();
+        PCB proximoProcesso = sistema.so.pm.processReady.remove(0);
         if (proximoProcesso != null) {
             // Atualizar a CPU com o contexto do próximo processo
             hw.cpu.pc = proximoProcesso.pc;

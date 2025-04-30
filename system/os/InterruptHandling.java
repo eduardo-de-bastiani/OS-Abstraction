@@ -13,17 +13,17 @@ public class InterruptHandling {
 
     public void handle(Interrupts irpt) {
         switch (irpt) {
-            case Interrupts.intSTOP -> {
+            case intSTOP -> {
                 System.out.println("Handling intSTOP interrupt");
                 hw.sistema.so.sca.handleStopInterrupt(hw);
             }
             
-            case Interrupts.quantumTime -> {
+            case quantumTime -> {
                 System.out.println("Handling quantumTime interrupt");
                 hw.sistema.so.sca.handleQuantumInterrupt(hw);
             }
 
-            case Interrupts.intInstrucaoInvalida -> System.out.println("Handling intInstrucaoInvalida interrupt");
+            case intInstrucaoInvalida -> System.out.println("Handling intInstrucaoInvalida interrupt");
             // Add logic to handle intInstrucaoInvalida
 
             default -> System.out.println("Unknown interrupt");
