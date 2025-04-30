@@ -21,7 +21,10 @@ public class InterruptHandling {
                 hw.sistema.so.sca.handleQuantumInterrupt(hw);
             }
 
-            case intInstrucaoInvalida -> System.out.println("Handling intInstrucaoInvalida interrupt");
+            case intInstrucaoInvalida -> {
+                System.out.println("Handling intInstrucaoInvalida interrupt");
+                hw.sistema.so.sca.handleStopInterrupt(hw);
+            }
             // Add logic to handle intInstrucaoInvalida
 
             default -> System.out.println("Unknown interrupt");
