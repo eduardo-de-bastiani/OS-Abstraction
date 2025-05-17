@@ -15,7 +15,8 @@ public class CPU {
     private boolean debug; // para depuracao
     private Sistema sistema; // referencia ao sistema para acesso a utilitarios
     public boolean waitOnInstruction = false; // para depuracao
-    
+    public boolean cpuStop = false;
+
     public CPU(Memory _mem, boolean _debug, Sistema sistema) {
         mem = _mem;
         debug = _debug;
@@ -35,21 +36,22 @@ public class CPU {
     public void run() {
         // execucao da CPU supoe que o contexto da CPU, vindo do PCB, ja esta devidamente setado
         // pc e registradores já contém os valores corretos
-        
-        while (true) {
+
+
+        while (!cpuStop) {
             // --------------------------------------------------------------------------------------------------
             // FETCH
-            
+
             if (pc < 0 || pc >= mem.pos.length) {
                 ih.handle(Interrupts.intEnderecoInvalido);
                 break; // ?
             }
-            
+
             // Verifica se o endereço lógico está na memória usando o MMU
             int enderecoFisico;
             try {
                 enderecoFisico = sistema.so.mm.mmu(pc);
-                
+
                 // Se retornou -1, houve page fault
                 if (enderecoFisico == -1) {
                     // Gera interrupção de page fault
@@ -61,9 +63,9 @@ public class CPU {
                 ih.handle(Interrupts.intEnderecoInvalido);
                 break;
             }
-            
+
             Word w = mem.pos[enderecoFisico];
-            
+
             if (debug) {
                 System.out.print("PC=" + pc + ", exec: ");
                 System.out.print(w.opc + " ");
@@ -71,11 +73,11 @@ public class CPU {
                 System.out.print(w.rb + " ");
                 System.out.println(w.p);
             }
-            
+
             // --------------------------------------------------------------------------------------------------
             // EXECUTA INSTRUCAO NO ir
 
-            switch (Opcode.values()[w.opc]) { // agora usando enum Opcode
+            switch (Opcode.values()[w.opc.ordinal()]) { // agora usando enum Opcode
                 case LDI: // LDI r,k
                     reg[w.ra] = w.p;
                     pc++;
@@ -88,7 +90,7 @@ public class CPU {
                             ih.handle(Interrupts.intPageFault);
                             break;
                         }
-                        mem.pos[enderecoFisicoSTD].opc = Opcode.DATA.ordinal();
+                        mem.pos[enderecoFisicoSTD].opc = Opcode.DATA;
                         mem.pos[enderecoFisicoSTD].p = reg[w.ra];
                     } catch (Exception e) {
                         System.out.println("Erro ao acessar memória: " + e.getMessage());
@@ -275,7 +277,7 @@ public class CPU {
                     ih.handle(Interrupts.intInstrucaoInvalida);
                     break;
             }
-            
+
             if (waitOnInstruction) {
                 try {
                     Thread.sleep(500);
