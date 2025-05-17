@@ -4,7 +4,7 @@ import system.os.Interrupts;
 import system.os.InterruptHandling;
 import system.os.SysCallHandling;
 import system.core.Sistema;
-import system.hardware.Opcode; // <--- Adicione esta linha
+import system.software.Opcode;
 
 public class CPU {
     public int pc; // program counter
