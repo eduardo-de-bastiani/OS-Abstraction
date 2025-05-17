@@ -4,7 +4,6 @@ import system.os.Interrupts;
 import system.os.InterruptHandling;
 import system.os.SysCallHandling;
 import system.core.Sistema;
-import system.hardware.Opcode; // <--- Adicione esta linha
 
 public class CPU {
     public int pc; // program counter
@@ -74,20 +73,25 @@ public class CPU {
             
             // --------------------------------------------------------------------------------------------------
             // EXECUTA INSTRUCAO NO ir
-
-            switch (Opcode.values()[w.opc]) { // agora usando enum Opcode
-                case LDI: // LDI r,k
+            
+            switch (w.opc) { // conforme o opcode
+                // Instrucoes de Busca e Armazenamento em Memoria
+                case 1: // LDI r,k
                     reg[w.ra] = w.p;
                     pc++;
                     break;
-
-                case STD: // STD k,r
+                    
+                case 2: // STD k,r
                     try {
                         int enderecoFisicoSTD = sistema.so.mm.mmu(w.p);
+                        
+                        // Se retornou -1, houve page fault
                         if (enderecoFisicoSTD == -1) {
+                            // Gera interrupção de page fault
                             ih.handle(Interrupts.intPageFault);
                             break;
                         }
+                        
                         mem.pos[enderecoFisicoSTD].opc = Opcode.DATA.ordinal();
                         mem.pos[enderecoFisicoSTD].p = reg[w.ra];
                     } catch (Exception e) {
@@ -97,65 +101,69 @@ public class CPU {
                     }
                     pc++;
                     break;
-
-                case ADD: // ADD r,s
+                    
+                case 3: // ADD r,s
                     reg[w.ra] = reg[w.ra] + reg[w.rb];
                     pc++;
                     break;
-
-                case MULT: // MULT r,s
+                    
+                case 4: // MULT r,s
                     reg[w.ra] = reg[w.ra] * reg[w.rb];
                     pc++;
                     break;
-
-                case CALL: // CALL r,s
+                    
+                case 5: // CALL r,s
                     reg[w.ra] = pc + 1;
                     pc = w.p;
                     break;
-
-                case RET: // RET
+                    
+                case 6: // RET
                     pc = reg[w.ra];
                     break;
-
-                case JMP: // JMP p
+                    
+                case 7: // JMP p
                     pc = w.p;
                     break;
-
-                case JMPI: // JMPI r
+                    
+                case 8: // JMPI r
                     pc = reg[w.ra];
                     break;
-
-                case JMPIG: // JMPIG r,s
+                    
+                case 9: // JMPIG r,s
                     if (reg[w.rb] > 0) {
                         pc = reg[w.ra];
                     } else {
                         pc++;
                     }
                     break;
-
-                case JMPIL: // JMPIL r,s
+                    
+                case 10: // JMPIL r,s
                     if (reg[w.rb] < 0) {
                         pc = reg[w.ra];
                     } else {
                         pc++;
                     }
                     break;
-
-                case JMPIE: // JMPIE r,s
+                    
+                case 11: // JMPIE r,s
                     if (reg[w.rb] == 0) {
                         pc = reg[w.ra];
                     } else {
                         pc++;
                     }
                     break;
-
-                case JMPIM: // JMPIM r,s
+                    
+                case 12: // JMPIM r,s
                     try {
                         int enderecoFisicoJMPIM = sistema.so.mm.mmu(reg[w.ra]);
+                        
+                        // Se retornou -1, houve page fault
                         if (enderecoFisicoJMPIM == -1) {
+                            // Gera interrupção de page fault
                             ih.handle(Interrupts.intPageFault);
                             break;
                         }
+                        
                         pc = mem.pos[enderecoFisicoJMPIM].p;
                     } catch (Exception e) {
                         System.out.println("Erro ao acessar memória: " + e.getMessage());
@@ -163,15 +171,19 @@ public class CPU {
                         break;
                     }
                     break;
-
-                case JMPIGM: // JMPIGM r,s
+                    
+                case 13: // JMPIGM r,s
                     if (reg[w.rb] > 0) {
                         try {
                             int enderecoFisicoJMPIGM = sistema.so.mm.mmu(reg[w.ra]);
+                            
+                            // Se retornou -1, houve page fault
                             if (enderecoFisicoJMPIGM == -1) {
+                                // Gera interrupção de page fault
                                 ih.handle(Interrupts.intPageFault);
                                 break;
                             }
+                            
                             pc = mem.pos[enderecoFisicoJMPIGM].p;
                         } catch (Exception e) {
                             System.out.println("Erro ao acessar memória: " + e.getMessage());
@@ -182,15 +194,19 @@ public class CPU {
                         pc++;
                     }
                     break;
-
-                case JMPILM: // JMPILM r,s
+                    
+                case 14: // JMPILM r,s
                     if (reg[w.rb] < 0) {
                         try {
                             int enderecoFisicoJMPILM = sistema.so.mm.mmu(reg[w.ra]);
+                            
+                            // Se retornou -1, houve page fault
                             if (enderecoFisicoJMPILM == -1) {
+                                // Gera interrupção de page fault
                                 ih.handle(Interrupts.intPageFault);
                                 break;
                             }
+                            
                             pc = mem.pos[enderecoFisicoJMPILM].p;
                         } catch (Exception e) {
                             System.out.println("Erro ao acessar memória: " + e.getMessage());
@@ -201,15 +217,19 @@ public class CPU {
                         pc++;
                     }
                     break;
-
-                case JMPIEM: // JMPIEM r,s
+                    
+                case 15: // JMPIEM r,s
                     if (reg[w.rb] == 0) {
                         try {
                             int enderecoFisicoJMPIEM = sistema.so.mm.mmu(reg[w.ra]);
+                            
+                            // Se retornou -1, houve page fault
                             if (enderecoFisicoJMPIEM == -1) {
+                                // Gera interrupção de page fault
                                 ih.handle(Interrupts.intPageFault);
                                 break;
                             }
+                            
                             pc = mem.pos[enderecoFisicoJMPIEM].p;
                         } catch (Exception e) {
                             System.out.println("Erro ao acessar memória: " + e.getMessage());
@@ -220,29 +240,33 @@ public class CPU {
                         pc++;
                     }
                     break;
-
-                case SWAP: // SWAP r,s
+                    
+                case 16: // SWAP r,s
                     int aux = reg[w.ra];
                     reg[w.ra] = reg[w.rb];
                     reg[w.rb] = aux;
                     pc++;
                     break;
-
-                case STOP: // STOP
+                    
+                case 17: // STOP
                     ih.handle(Interrupts.intSTOP);
                     break;
-
-                case DATA: // DATA
+                    
+                case 18: // DATA
                     pc++;
                     break;
-
-                case LD: // LD r,s
+                    
+                case 19: // LD r,s
                     try {
                         int enderecoFisicoLD = sistema.so.mm.mmu(reg[w.rb]);
+                        
+                        // Se retornou -1, houve page fault
                         if (enderecoFisicoLD == -1) {
+                            // Gera interrupção de page fault
                             ih.handle(Interrupts.intPageFault);
                             break;
                         }
+                        
                         reg[w.ra] = mem.pos[enderecoFisicoLD].p;
                     } catch (Exception e) {
                         System.out.println("Erro ao acessar memória: " + e.getMessage());
@@ -251,13 +275,13 @@ public class CPU {
                     }
                     pc++;
                     break;
-
-                case SUB: // SUB r,s
+                    
+                case 20: // SUB r,s
                     reg[w.ra] = reg[w.ra] - reg[w.rb];
                     pc++;
                     break;
-
-                case DIV: // DIV r,s
+                    
+                case 21: // DIV r,s
                     if (reg[w.rb] == 0) {
                         ih.handle(Interrupts.intInstrucaoInvalida);
                         break;
@@ -265,12 +289,12 @@ public class CPU {
                     reg[w.ra] = reg[w.ra] / reg[w.rb];
                     pc++;
                     break;
-
-                case TRAP: // TRAP
+                    
+                case 22: // TRAP
                     sysCall.handle();
                     pc++;
                     break;
-
+                    
                 default:
                     ih.handle(Interrupts.intInstrucaoInvalida);
                     break;
