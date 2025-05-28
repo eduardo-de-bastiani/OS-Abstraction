@@ -25,7 +25,26 @@ public class InterruptHandling {
                 System.out.println("Handling intInstrucaoInvalida interrupt");
                 hw.sistema.so.sca.handleStopInterrupt(hw);
             }
-            // Add logic to handle intInstrucaoInvalida
+            
+            case intPageFault -> {
+                System.out.println("Handling intPageFault interrupt");
+                hw.sistema.so.mm.handlePageFault(hw.cpu.reg[8]); // Reg[8] contém o endereço lógico que causou o page fault
+            }
+            
+            case intIOComplete -> {
+                System.out.println("Handling intIOComplete interrupt");
+                hw.sistema.so.mm.handleIOComplete();
+            }
+            
+            case intDiskSaveComplete -> {
+                System.out.println("Handling intDiskSaveComplete interrupt");
+                hw.sistema.so.mm.handleDiskSaveComplete();
+            }
+            
+            case intDiskLoadComplete -> {
+                System.out.println("Handling intDiskLoadComplete interrupt");
+                hw.sistema.so.mm.handleDiskLoadComplete();
+            }
 
             default -> System.out.println("Unknown interrupt");
         }
