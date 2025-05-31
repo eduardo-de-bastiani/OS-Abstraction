@@ -442,6 +442,7 @@ public class MemoryManager {
             victimPageNumber = -1;
             victimFrameNumber = -1;
         }
+
     }
     
     // Método para tratar a conclusão de uma operação de IO
@@ -455,23 +456,32 @@ public class MemoryManager {
         // Simula a cópia da página da memória principal para a memória secundária
         int memStartAddr = frameNumber * pageSize;
         int diskStartAddr = pageNumber * pageSize;
-        
+
         for (int i = 0; i < pageSize; i++) {
             secMem.pos[diskStartAddr + i] = new Word(
-                mem.pos[memStartAddr + i].opc,
-                mem.pos[memStartAddr + i].ra,
-                mem.pos[memStartAddr + i].rb,
-                mem.pos[memStartAddr + i].p
+                    mem.pos[memStartAddr + i].opc,
+                    mem.pos[memStartAddr + i].ra,
+                    mem.pos[memStartAddr + i].rb,
+                    mem.pos[memStartAddr + i].p
             );
         }
-        
+
         System.out.println("Página " + pageNumber + " do processo " + processId + " salva no disco.");
-        
-        // Gera interrupção de conclusão de salvamento
-        pm.processRunning.saveContext(pm.processRunning.reg, pm.processRunning.pc);
-        pm.processRunning = null;
-        
-        // Simula a interrupção
+
+        // Em vez de usar pm.processRunning, vamos buscar o PCB correto pelo PID:
+        PCB pcb = null;
+        for (PCB p : pm.processBlocked) {
+            if (p.pid == processId) {
+                pcb = p;
+                break;
+            }
+        }
+        if (pcb != null) {
+            // Salva o contexto do PCB bloqueado (ele já não está em execução)
+            pcb.saveContext(pcb.reg, pcb.pc);
+        }
+
+        // Simula a interrupção (chama o handler de "disk save complete")
         handleDiskSaveComplete();
     }
     
@@ -480,23 +490,32 @@ public class MemoryManager {
         // Simula a cópia da página da memória secundária para a memória principal
         int diskStartAddr = pageNumber * pageSize;
         int memStartAddr = frameNumber * pageSize;
-        
+
         for (int i = 0; i < pageSize; i++) {
             mem.pos[memStartAddr + i] = new Word(
-                secMem.pos[diskStartAddr + i].opc,
-                secMem.pos[diskStartAddr + i].ra,
-                secMem.pos[diskStartAddr + i].rb,
-                secMem.pos[diskStartAddr + i].p
+                    secMem.pos[diskStartAddr + i].opc,
+                    secMem.pos[diskStartAddr + i].ra,
+                    secMem.pos[diskStartAddr + i].rb,
+                    secMem.pos[diskStartAddr + i].p
             );
         }
-        
+
         System.out.println("Página " + pageNumber + " do processo " + processId + " carregada do disco.");
-        
-        // Gera interrupção de conclusão de carregamento
-        pm.processRunning.saveContext(pm.processRunning.reg, pm.processRunning.pc);
-        pm.processRunning = null;
-        
-        // Simula a interrupção
+
+        // Em vez de usar pm.processRunning, buscamos o PCB correspondente ao processId:
+        PCB pcb = null;
+        for (PCB p : pm.processBlocked) {
+            if (p.pid == processId) {
+                pcb = p;
+                break;
+            }
+        }
+        if (pcb != null) {
+            // Salva o contexto do PCB (ele estava bloqueado aguardando esta página)
+            pcb.saveContext(pcb.reg, pcb.pc);
+        }
+
+        // Simula a interrupção de load completo
         handleDiskLoadComplete();
     }
     
