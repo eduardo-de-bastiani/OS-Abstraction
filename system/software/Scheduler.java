@@ -48,14 +48,17 @@ public class Scheduler implements Runnable {
         quantumCounter = 0; // Reinicia o contador de quanta
     }
 
-    public void handleStopInterrupt(HW hw){
-        //zerar o quantum counter do scheduler
+    public void handleStopInterrupt(HW hw) {
+        // Zerar o quantum counter do scheduler
         this.quantumCompleted();
 
-        //remove o processo em execução
-        hw.sistema.so.pm.removeProcess(hw.sistema.so.pm.processRunning.pid);
+        // Remove o processo em execução
+        if (hw.sistema.so.pm.processRunning != null) {
+            hw.sistema.so.pm.removeProcess(hw.sistema.so.pm.processRunning.pid);
+            hw.sistema.so.pm.processRunning = null; // <- ESSA LINHA É ESSENCIAL
+        }
 
-        //chama o scheduler para pegar o próximo processo
+        // Chama o scheduler para pegar o próximo processo
         if (!hw.sistema.so.pm.processReady.isEmpty()) {
             PCB proximoProcesso = hw.sistema.so.pm.processReady.remove(0);
             hw.sistema.so.pm.processRunning = proximoProcesso;
@@ -66,6 +69,26 @@ public class Scheduler implements Runnable {
             hw.cpu.cpuStop = true;
         }
     }
+
+
+//    public void handleStopInterrupt(HW hw){
+//        //zerar o quantum counter do scheduler
+//        this.quantumCompleted();
+//
+//        //remove o processo em execução
+//        hw.sistema.so.pm.removeProcess(hw.sistema.so.pm.processRunning.pid);
+//
+//        //chama o scheduler para pegar o próximo processo
+//        if (!hw.sistema.so.pm.processReady.isEmpty()) {
+//            PCB proximoProcesso = hw.sistema.so.pm.processReady.remove(0);
+//            hw.sistema.so.pm.processRunning = proximoProcesso;
+//            hw.cpu.pc = proximoProcesso.pc;
+//            hw.cpu.reg = proximoProcesso.reg.clone();
+//        } else {
+//            // Se não houver mais processos prontos, parar a CPU
+//            hw.cpu.cpuStop = true;
+//        }
+//    }
 
     public void handleQuantumInterrupt(HW hw){
         // Obter o sistema a partir do hardware

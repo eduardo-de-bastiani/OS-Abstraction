@@ -12,12 +12,14 @@ public class ProcessManager {
     public MemoryManager memoryManager;
     public Scheduler Scheduler;
 
-    //retorna a juncao de todas as listas de processos (bloqueando, pronto e rodando)
-    private List<PCB> getAllProcesses() {
+    // Retorna a junção de todas as listas de processos (bloqueados, prontos e rodando)
+    public List<PCB> getAllProcesses() {
         List<PCB> all = new ArrayList<>();
         all.addAll(processReady);
         all.addAll(processBlocked);
-        all.add(processRunning);
+        if (processRunning != null) {
+            all.add(processRunning);
+        }
         return all;
     }
     
@@ -25,6 +27,7 @@ public class ProcessManager {
         this.Scheduler = new Scheduler(quantum);
     }
 
+    // Método original para compatibilidade
     public boolean createProcess(Program p) {
         int[] pageTable = memoryManager.aloca(p.image);
         
@@ -34,6 +37,19 @@ public class ProcessManager {
         processReady.add(pcb);
 
         System.out.println("Processo " + p.name + " criado com PID: " + idCounter);
+        return true;
+    }
+    
+    // Novo método para criar processo carregando apenas a primeira página
+    public boolean createProcessWithFirstPage(Program p) {
+        int[] pageTable = memoryManager.alocaFirstPage(p);
+        
+        idCounter++;
+        PCB pcb = new PCB(idCounter, pageTable, p.name, memoryManager.pageSize);
+    
+        processReady.add(pcb);
+
+        System.out.println("Processo " + p.name + " criado com PID: " + idCounter + " (apenas primeira página carregada)");
         return true;
     }
 
@@ -66,6 +82,8 @@ public class ProcessManager {
 
     public void setFirstProcessRunning() {
         // TODO alterar para chamar o scheduler
-        this.processRunning = processReady.remove(0); // remove o primeiro da lista de prontos
+        if (!processReady.isEmpty()) {
+            this.processRunning = processReady.remove(0); // remove o primeiro da lista de prontos
+        }
     }
 }

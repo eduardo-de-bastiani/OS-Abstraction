@@ -7,5 +7,6 @@ public enum Opcode {
         JMPIGK, JMPILK, JMPIEK, JMPIGT,
         ADDI, SUBI, ADD, SUB, MULT, // matematicos
         LDI, LDD, STD, LDX, STX, MOVE, // movimentacao
-        SYSCALL, STOP // chamada de sistema e parada
+        SYSCALL, STOP,// chamada de sistema e parada
+        CALL, RET,  SWAP, LD, DIV, TRAP
 }

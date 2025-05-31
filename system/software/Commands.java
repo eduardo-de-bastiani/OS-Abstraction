@@ -76,7 +76,8 @@ public class Commands {
             return;
         }
         try {
-            sys.so.pm.createProcess(new Program(name, image));
+            // Modificação para carregar apenas a primeira página do programa
+            sys.so.pm.createProcessWithFirstPage(new Program(name, image));
         } catch (OutOfMemoryError e) {
             System.out.println("Erro ao criar processo: memória insuficiente.");
         }
@@ -133,11 +134,16 @@ public class Commands {
                 
                 for (int i = 0; i < pcb.pageTable.length; i++) {
                     int frameNumber = pcb.pageTable[i];
-                    int startAddr = frameNumber * pageSize;
-                    int endAddr = startAddr + pageSize;
-                    
-                    System.out.println("------ Página Lógica " + i + " -> Frame Físico " + frameNumber + " ------");
-                    sys.so.utils.dump(startAddr, endAddr);
+                    // Verifica se a página está carregada na memória
+                    if (frameNumber >= 0) {
+                        int startAddr = frameNumber * pageSize;
+                        int endAddr = startAddr + pageSize;
+                        
+                        System.out.println("------ Página Lógica " + i + " -> Frame Físico " + frameNumber + " ------");
+                        sys.so.utils.dump(startAddr, endAddr);
+                    } else {
+                        System.out.println("------ Página Lógica " + i + " -> Não carregada (em memória virtual) ------");
+                    }
                 }
             } else {
                 System.out.println("Processo não possui memória alocada.");
