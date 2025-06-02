@@ -79,6 +79,10 @@ public class Scheduler implements Runnable {
             sistema.so.pm.processReady.add(processoAtual);
         }
 
+        if (sistema.so.pm.processReady.isEmpty()) {
+            return;
+        }
+
         // Selecionar o próximo processo da lista de prontos para execução
         PCB proximoProcesso = sistema.so.pm.processReady.remove(0);
         if (proximoProcesso != null) {
@@ -91,7 +95,7 @@ public class Scheduler implements Runnable {
         }
         //printa o processo em execução
         if (sistema.so.pm.processRunning == null) return;
-        
+
         System.out.println("Processo em execução: " + sistema.so.pm.processRunning.pid + " - " + sistema.so.pm.processRunning.programName);
     }
 
