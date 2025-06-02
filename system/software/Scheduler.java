@@ -90,6 +90,8 @@ public class Scheduler implements Runnable {
             sistema.so.pm.processRunning = proximoProcesso;
         }
         //printa o processo em execução
+        if (sistema.so.pm.processRunning == null) return;
+        
         System.out.println("Processo em execução: " + sistema.so.pm.processRunning.pid + " - " + sistema.so.pm.processRunning.programName);
     }
 
