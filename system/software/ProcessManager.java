@@ -2,6 +2,8 @@ package system.software;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import system.hardware.HW;
 import system.os.MemoryManager;
 
 public class ProcessManager {
@@ -11,6 +13,7 @@ public class ProcessManager {
     private int idCounter = 0;
     public MemoryManager memoryManager;
     public Scheduler Scheduler;
+    private final Thread blockedManagerThread;
 
     //retorna a juncao de todas as listas de processos (bloqueando, pronto e rodando)
     private List<PCB> getAllProcesses() {
@@ -23,6 +26,28 @@ public class ProcessManager {
     
     public ProcessManager(int quantum) {
         this.Scheduler = new Scheduler(quantum);
+        blockedManagerThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(3000); // tempo de espera entre verificações
+
+                    synchronized (processBlocked) {
+                        if (!processBlocked.isEmpty()) {
+                            PCB p = processBlocked.remove(0);
+
+                            synchronized (processReady) {
+                                processReady.add(p);
+                                System.out.println("[Desbloqueio] Processo " + p.pid + " movido para ready.");
+                            }
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        blockedManagerThread.setDaemon(true); // encerra com o sistema
+        blockedManagerThread.start(); // inicia a thread
     }
 
     public boolean createProcess(Program p) {
@@ -68,5 +93,11 @@ public class ProcessManager {
         if (processReady.isEmpty()) return false; // se não houver processos prontos, não faz nada
         this.processRunning = processReady.remove(0); // remove o primeiro da lista de prontos
         return true;
+    }
+
+    public void setBlockedProcess(HW hw) {
+        this.processBlocked.add(processRunning);
+        System.out.println("Processo " + processRunning.pid + " foi bloqueado.");
+        Scheduler.handleQuantumInterrupt(hw);
     }
 }

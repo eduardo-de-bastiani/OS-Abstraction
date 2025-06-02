@@ -1,7 +1,7 @@
 - ProcessManagery
-    - terminar metodo removeProcess
+    - terminar metodo removeProcess ✅
     
-- classe Commands
+- classe Commands ✅
     - implementar comandos
         - rm <id>
         - ps
@@ -13,9 +13,9 @@
         - exit
 
 - Na CPU, devemos implementar a função de Memory Mapping (MMU) para o nosso sistema executar o programa a partir das posições lógicas das instrução (feito?)
-    - a entrada da função de MMU é tabela de páginas e a posição lógica da instrução
+    - a entrada da função de MMU é tabela de páginas e a posição lógica da  ✅
 
-## Escalonamento com Round Robin
+## Escalonamento com Round Robin  (Verificar a carga da memória)
 
 > consultar arquivo Sistema.java disponível no Discord
 
@@ -37,17 +37,19 @@
 
     - Criar class Scheduler ✅
 
-    - Implementar o método RoundRobin 
-    
+    - Implementar o método RoundRobin ✅
+
         - Fica em loop infinito (while (true)), aguardando o semáforo do relógio
         - A cada liberação, dispara a rotina de troca de contexto
+    
+    - Passar lógica das interrupções para o Scheduler
 
 
-3. Implementação do “Relógio” (Quantum)
+3. Implementação do “Relógio” (Quantum) ✅
 
 Duas abordagens:
 
-    - Thread de relógio:
+    - Thread de relógio: (não realizado)
 
         Dentro de Scheduler, criar uma thread que:
 
@@ -55,11 +57,11 @@ Duas abordagens:
 
             Após acordar, libera o semáforo de scheduler.
 
-    - Contador de instruções: (mais fácil)
+    - Contador de instruções: (mais fácil) ✅
 
-        No ciclo de execução de instruções da CPU, incrementar um contador.
+        No ciclo de execução de instruções da CPU, incrementar um contador. ✅
 
-        Quando atingir quantum, acionar manualmente a interrupção (liberar semáforo).
+        Quando atingir quantum, acionar manualmente a interrupção (liberar semáforo). ✅
 
 
 4. Manipulação de Interrupções
@@ -68,11 +70,11 @@ Duas abordagens:
 
         - Adicionar um switch para as causas de interrupção:
 
-            TIMER (fim de quantum).
+            TIMER (fim de quantum). ✅
 
-            STOP (processo executou instrução STOP).
+            STOP (processo executou instrução STOP). ✅
 
-            INVALID_INSTR (opcional, instrução inválida).
+            INVALID_INSTR (opcional, instrução inválida). A Fazer
 
 
 5. Rotina de troca de contexto:
@@ -96,7 +98,7 @@ Duas abordagens:
     Liberar semáforo de CPU para que a thread de execução continue.
 
 
-6. Rotina de Fim de Processo (handleStopInterrupt)
+6. Rotina de Fim de Processo (handleStopInterrupt) ✅
 
     - Quando receber interrupção STOP: 
 
@@ -109,7 +111,7 @@ Duas abordagens:
     Escolher novo processo da fila de prontos e executar troca de contexto (pode chamar a mesma lógica de TIMER).
 
 
-7. Comando execAll -> o sor provavelmente vai querer ver essa execução!!
+7. Comando execAll -> o sor provavelmente vai querer ver essa execução!! 
 
     - Adicionar em Sistema o comando execAll que:
 
@@ -135,3 +137,25 @@ Duas abordagens:
         Thread de comandos (criando/removendo PCBs).
 
         Thread de escalonamento (acessando filas e semáforos).
+
+
+#### Movimentação dos processos para fila de bloqueados automaticamente
+
+- quando um processo solicita acesso a um dispositivo de I/O, devem ocorrer as seguintes ações: 
+1. O processo deve ser movido para bloqueado.
+2. Outro processo deve ser escalonado.
+3. O pedido de I/O deve ser despachado para fila do dispositivo e a operação realizada no mesmo.
+
+As ações devem ser realizadas concorrentemente, com **multithreading**
+
+#### Interrupção de finalização de I/O
+
+- Devemos criar uma variável na CPU para que o dispositivo de I/O sinalize a interrupção.
+- O processo que estava bloqueado deve ser movido para a fila de prontos para ser escalonado novamente.
+- O processo que foi interrompido também volta para a fila de prontos.
+
+#### Criação do DMA
+
+- As operações de I/O são realizadas **sem envolver a CPU**
+- precisaremos de uma Thread para o DMA fazer leitura e escrita **somente na memória principal**
+- DMA é concorrente com a CPU. Executa pedidos de I/O enquanto a CPU executa instruções de outros processos.
