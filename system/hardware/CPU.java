@@ -107,10 +107,9 @@ public class CPU implements Runnable {
             }
 
             if (sys.so.pm.processRunning == null) {
-                if (!sys.so.pm.setFirstProcessRunning()) {
-                    System.out.println("Nenhum processo está em execução.");
-                    continue;
-                }
+                sys.so.pm.Scheduler.handleQuantumInterrupt(sys.hw); //joga um processo novo pra rodar
+                System.out.println("Nenhum processo está em execução.");
+                continue;
             }
             
             if (legal(pc)) {
