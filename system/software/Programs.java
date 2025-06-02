@@ -290,6 +290,12 @@ public class Programs {
                             new Word(Opcode.DATA, -1, -1, -1),
                             new Word(Opcode.DATA, -1, -1, -1),
                             new Word(Opcode.DATA, -1, -1, -1)
+                    }),
+                 new Program("dummy",
+                    new Word[] {
+                        new Word(Opcode.JMP,0, -1, 1), // Dummy program that does nothing
+                        new Word(Opcode.JMP, 0, -1, 0), // Dummy program that does nothing
                     })
+
     };
 }
