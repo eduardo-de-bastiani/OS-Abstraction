@@ -63,7 +63,7 @@ public class Scheduler implements Runnable {
             hw.cpu.reg = proximoProcesso.reg.clone();
         } else {
             // Se não houver mais processos prontos, parar a CPU
-            hw.cpu.cpuStop = true;
+            //hw.cpu.cpuStop = true;
         }
     }
 

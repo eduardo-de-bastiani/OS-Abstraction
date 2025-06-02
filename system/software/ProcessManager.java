@@ -64,8 +64,9 @@ public class ProcessManager {
         return true;
     }
 
-    public void setFirstProcessRunning() {
-        // TODO alterar para chamar o scheduler
+    public boolean setFirstProcessRunning() {
+        if (processReady.isEmpty()) return false; // se não houver processos prontos, não faz nada
         this.processRunning = processReady.remove(0); // remove o primeiro da lista de prontos
+        return true;
     }
 }

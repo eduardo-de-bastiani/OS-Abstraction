@@ -98,6 +98,21 @@ public class CPU implements Runnable {
     public void run() {
         cpuStop = false;
         while (!cpuStop) {
+            if (waitOnInstruction) {
+                try {
+                    Thread.sleep(250); // espera 1 segundo entre as instruções
+                } catch (InterruptedException e) {
+                    System.out.println("Erro ao pausar a execução: " + e.getMessage());
+                }
+            }
+
+            if (sys.so.pm.processRunning == null) {
+                if (!sys.so.pm.setFirstProcessRunning()) {
+                    System.out.println("Nenhum processo está em execução.");
+                    continue;
+                }
+            }
+            
             if (legal(pc)) {
                 ir = m[mm.mmu(pc)];
                 if (debug) {
@@ -294,15 +309,6 @@ public class CPU implements Runnable {
             if (irpt != Interrupts.noInterrupt) {
                 ih.handle(irpt);
                 irpt = Interrupts.noInterrupt; // reset da interrupcao
-            }
-
-        
-            if (waitOnInstruction) {
-                try {
-                    Thread.sleep(250); // espera 1 segundo entre as instruções
-                } catch (InterruptedException e) {
-                    System.out.println("Erro ao pausar a execução: " + e.getMessage());
-                }
             }
         }
     }
