@@ -73,7 +73,7 @@ public class ProcessManager {
     }
 
     public void setBlockedProcess(HW hw) {
-        processRunning.saveContext(hw.cpu.reg, hw.cpu.pc);
+        processRunning.saveContext(hw.cpu.reg, hw.cpu.pc + 1);
         this.processBlocked.add(processRunning);
         System.out.println("Processo " + processRunning.pid + " foi bloqueado.");
         this.processRunning = null;
