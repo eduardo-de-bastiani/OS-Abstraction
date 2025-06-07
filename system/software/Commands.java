@@ -13,6 +13,7 @@ public class Commands {
         void execute(String[] args);
     }
 
+     InputDevice inputDevice = sys.so.inputDevice;
     private final Programs progs;
     private final Sistema sys;
     private final Map<String, Comando> commands = new HashMap<>();
@@ -31,6 +32,7 @@ public class Commands {
         commands.put("traceOn",  args -> cmdTraceOn());
         commands.put("traceOff", args -> cmdTraceOff());
         commands.put("help",     args -> cmdHelp());
+        commands.put("in",       this::cmdIn);
     }
 
     public void waitForCommands() {
@@ -194,6 +196,21 @@ public class Commands {
         }).start();
 
         System.out.println("Processos estão sendo executados em paralelo.");
+    }
+
+    private void cmdIn(String[] args) {
+        if (args.length < 1) {
+            System.out.println("Uso: in <valor>");
+            return;
+        }
+
+        try {
+            int value = Integer.parseInt(args[0]);
+            inputDevice.addToQueue(value);
+            System.out.println("Valor " + value + " adicionado à fila de entrada.");
+        } catch (NumberFormatException e) {
+            System.out.println("Valor inválido: " + args[0]);
+        }
     }
 
     private void cmdTraceOn() {
