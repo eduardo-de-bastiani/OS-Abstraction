@@ -28,7 +28,7 @@ public class Commands {
         commands.put("dump",     this::cmdDump);
         commands.put("dumpM",    this::cmdDumpM);
         commands.put("exec",     this::cmdExec);
-        commands.put("execLoop",     this::cmdExecLoop);
+        commands.put("execLoop", this::cmdExecLoop);
         commands.put("traceOn",  args -> cmdTraceOn());
         commands.put("traceOff", args -> cmdTraceOff());
         commands.put("help",     args -> cmdHelp());
@@ -231,6 +231,7 @@ public class Commands {
         System.out.println("  dump <pid>          - exibe PCB e memória do processo");
         System.out.println("  dumpM <start> <end> - exibe memória do sistema entre posições");
         //nao conseguimos implementar exec <pid> a tempo
+        System.out.println("  execLoop            - executa a cpu em thread separado");
         System.out.println("  exec                - executa todos os processos");
         System.out.println("  traceOn             - habilita modo de trace da CPU");
         System.out.println("  traceOff            - desabilita modo de trace da CPU");

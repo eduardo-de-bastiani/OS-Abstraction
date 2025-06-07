@@ -20,9 +20,15 @@ public class SysCallHandling {
     }
 
     public void handle() { // chamada de sistema
+        //TODO: começa thread de IO
+        //TODO: seta processo atual pra blocked
+
+        //TODO: salva estado do processo atual e passa a mexer so nos regs dele, no lugar dos da cpu
+
         // suporta somente IO, com parametros
         // reg[8] = in ou out e reg[9] endereco do inteiro
         System.out.println("SYSCALL pars:  " + hw.cpu.reg[8] + " / " + hw.cpu.reg[9]);
+        
 
         if (hw.cpu.reg[8] == 1) {
             // leitura - le a entrada do teclado do usuario e guarda em reg[9]
@@ -38,5 +44,7 @@ public class SysCallHandling {
         } else {
             System.out.println("  PARAMETRO INVALIDO");
         }
+
+        //TODO: tira processo atual de blocked e coloca em ready
     }
 }

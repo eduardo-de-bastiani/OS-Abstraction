@@ -30,7 +30,7 @@ public class CPU implements Runnable {
     // stop -
     // nesta versao acaba o sistema no fim do prog
 
-    public boolean waitOnInstruction; // flag para esperar após cada instrução
+    public boolean waitOnInstruction = true; // flag para esperar após cada instrução
 
     // auxilio aa depuração
     private Sistema sys;
@@ -98,6 +98,20 @@ public class CPU implements Runnable {
     public void run() {
         cpuStop = false;
         while (!cpuStop) {
+            if (waitOnInstruction) {
+                try {
+                    Thread.sleep(250); // espera 1 segundo entre as instruções
+                } catch (InterruptedException e) {
+                    System.out.println("Erro ao pausar a execução: " + e.getMessage());
+                }
+            }
+
+            if (sys.so.pm.processRunning == null) {
+                sys.so.pm.Scheduler.handleQuantumInterrupt(sys.hw); //joga um processo novo pra rodar
+                System.out.println("Nenhum processo está em execução.");
+                continue;
+            }
+            
             if (legal(pc)) {
                 ir = m[mm.mmu(pc)];
                 if (debug) {
@@ -269,8 +283,9 @@ public class CPU implements Runnable {
 
                     // Chamadas de sistema
                     case SYSCALL:
-                        sysCall.handle(); // <<<<< aqui desvia para rotina de chamada de sistema, no momento so
+                        //sysCall.handle(); // <<<<< aqui desvia para rotina de chamada de sistema, no momento so
                         // temos IO
+                        sys.so.pm.setBlockedProcess(sys.hw);
                         pc++;
                         break;
 
@@ -294,15 +309,6 @@ public class CPU implements Runnable {
             if (irpt != Interrupts.noInterrupt) {
                 ih.handle(irpt);
                 irpt = Interrupts.noInterrupt; // reset da interrupcao
-            }
-
-        
-            if (waitOnInstruction) {
-                try {
-                    Thread.sleep(1000); // espera 1 segundo entre as instruções
-                } catch (InterruptedException e) {
-                    System.out.println("Erro ao pausar a execução: " + e.getMessage());
-                }
             }
         }
     }

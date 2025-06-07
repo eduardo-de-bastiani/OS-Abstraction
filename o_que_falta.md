@@ -137,3 +137,25 @@ Duas abordagens:
         Thread de comandos (criando/removendo PCBs).
 
         Thread de escalonamento (acessando filas e semáforos).
+
+
+#### Movimentação dos processos para fila de bloqueados automaticamente
+
+- quando um processo solicita acesso a um dispositivo de I/O, devem ocorrer as seguintes ações: 
+1. O processo deve ser movido para bloqueado.
+2. Outro processo deve ser escalonado.
+3. O pedido de I/O deve ser despachado para fila do dispositivo e a operação realizada no mesmo.
+
+As ações devem ser realizadas concorrentemente, com **multithreading**
+
+#### Interrupção de finalização de I/O
+
+- Devemos criar uma variável na CPU para que o dispositivo de I/O sinalize a interrupção.
+- O processo que estava bloqueado deve ser movido para a fila de prontos para ser escalonado novamente.
+- O processo que foi interrompido também volta para a fila de prontos.
+
+#### Criação do DMA
+
+- As operações de I/O são realizadas **sem envolver a CPU**
+- precisaremos de uma Thread para o DMA fazer leitura e escrita **somente na memória principal**
+- DMA é concorrente com a CPU. Executa pedidos de I/O enquanto a CPU executa instruções de outros processos.
