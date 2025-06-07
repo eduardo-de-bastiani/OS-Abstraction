@@ -4,13 +4,30 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class InputDevice {
+    private static final InputDevice instance = new InputDevice();
     private Queue<Integer> queue = new LinkedList<>();
 
-    public void addToQueue(int value) {
-        queue.add(value);
+    private InputDevice() {
     }
 
-    public Integer readFromQueue() {
+    public static InputDevice getInstance() {
+        return instance;
+    }
+
+    public synchronized Integer readFromQueue() {
+        while (queue.isEmpty()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return null;
+            }
+        }
         return queue.poll();
+    }
+
+    public synchronized void addToQueue(int value) {
+        queue.add(value);
+        notifyAll();
     }
 }

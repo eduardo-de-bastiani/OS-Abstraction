@@ -1,16 +1,14 @@
 package system.os;
 
 import system.hardware.HW;
-
-import java.util.Scanner;
+import system.software.InputDevice;
+import system.software.PCB;
 
 public class SysCallHandling {
     private HW hw; // referencia ao hw se tiver que setar algo
-    private Scanner in;
 
     public SysCallHandling(HW _hw) {
         hw = _hw;
-        in = new Scanner(System.in);
     }
 
     public void stop() { // chamada de sistema indicando final de programa
@@ -28,16 +26,24 @@ public class SysCallHandling {
         // suporta somente IO, com parametros
         // reg[8] = in ou out e reg[9] endereco do inteiro
         System.out.println("SYSCALL pars:  " + hw.cpu.reg[8] + " / " + hw.cpu.reg[9]);
-        
 
         if (hw.cpu.reg[8] == 1) {
+            PCB current = hw.sistema.so.pm.processRunning;
+
+            hw.sistema.so.pm.setBlockedProcess(hw);
+
             // leitura - le a entrada do teclado do usuario e guarda em reg[9]
-            System.out.println("IN: Leitura do teclado (apenas valores inteiros): ");
-            int input = in.nextInt();
+            System.out.println("IN: Leitura do teclado (Use o comando IN, com o input em seguida): ");
+            int input = InputDevice.getInstance().readFromQueue();
+            
+            //current.reg[hw.cpu.reg[9]] = input;
+            //hw.mem.pos[hw.cpu.reg[9]].p = input;
+            hw.mem.pos[current.reg[9]].p = input; //armazena o valor lido na posicao de memoria indicada por reg[9]
+            hw.sistema.so.pm.removeBlockedProcess(current);
+
+            System.out.println("Entrada lida: " + input);
 
             // armazena a entrada no reg[9]
-            hw.mem.pos[hw.cpu.reg[9]].p = input;
-
         } else if (hw.cpu.reg[8] == 2) {
             // escrita - escreve o conteudo da memoria na posicao dada em reg[9]
             System.out.println("OUT:   " + hw.mem.pos[hw.cpu.reg[9]].p);

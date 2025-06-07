@@ -108,7 +108,7 @@ public class CPU implements Runnable {
 
             if (sys.so.pm.processRunning == null) {
                 sys.so.pm.Scheduler.handleQuantumInterrupt(sys.hw); //joga um processo novo pra rodar
-                System.out.println("Nenhum processo está em execução.");
+                //System.out.println("Nenhum processo está em execução.");
                 continue;
             }
             
@@ -283,9 +283,9 @@ public class CPU implements Runnable {
 
                     // Chamadas de sistema
                     case SYSCALL:
-                        //sysCall.handle(); // <<<<< aqui desvia para rotina de chamada de sistema, no momento so
+                        sysCall.handle(); // <<<<< aqui desvia para rotina de chamada de sistema, no momento so
                         // temos IO
-                        sys.so.pm.setBlockedProcess(sys.hw);
+                        //sys.so.pm.setBlockedProcess(sys.hw);
                         pc++;
                         break;
 

@@ -13,7 +13,6 @@ public class ProcessManager {
     private int idCounter = 0;
     public MemoryManager memoryManager;
     public Scheduler Scheduler;
-    private final Thread blockedManagerThread;
 
     //retorna a juncao de todas as listas de processos (bloqueando, pronto e rodando)
     private List<PCB> getAllProcesses() {
@@ -26,28 +25,6 @@ public class ProcessManager {
     
     public ProcessManager(int quantum) {
         this.Scheduler = new Scheduler(quantum);
-        blockedManagerThread = new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(3000); // tempo de espera entre verificações
-
-                    synchronized (processBlocked) {
-                        if (!processBlocked.isEmpty()) {
-                            PCB p = processBlocked.remove(0);
-
-                            synchronized (processReady) {
-                                processReady.add(p);
-                                System.out.println("[Desbloqueio] Processo " + p.pid + " movido para ready.");
-                            }
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        blockedManagerThread.setDaemon(true); // encerra com o sistema
-        blockedManagerThread.start(); // inicia a thread
     }
 
     public boolean createProcess(Program p) {
@@ -98,6 +75,18 @@ public class ProcessManager {
     public void setBlockedProcess(HW hw) {
         this.processBlocked.add(processRunning);
         System.out.println("Processo " + processRunning.pid + " foi bloqueado.");
+        this.processRunning = null;
         Scheduler.handleQuantumInterrupt(hw);
+    }
+
+    public void removeBlockedProcess(PCB pcb) {
+        synchronized (processBlocked) {
+            if (processBlocked.remove(pcb)) {
+                synchronized (processReady) {
+                    processReady.add(pcb);
+                    System.out.println("Processo " + pcb.pid + " removido de bloqueado e movido para ready.");
+                }
+            }
+        }
     }
 }

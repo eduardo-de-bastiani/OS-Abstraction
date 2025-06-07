@@ -13,7 +13,6 @@ public class Commands {
         void execute(String[] args);
     }
 
-     InputDevice inputDevice = sys.so.inputDevice;
     private final Programs progs;
     private final Sistema sys;
     private final Map<String, Comando> commands = new HashMap<>();
@@ -206,7 +205,7 @@ public class Commands {
 
         try {
             int value = Integer.parseInt(args[0]);
-            inputDevice.addToQueue(value);
+            InputDevice.getInstance().addToQueue(value);
             System.out.println("Valor " + value + " adicionado à fila de entrada.");
         } catch (NumberFormatException e) {
             System.out.println("Valor inválido: " + args[0]);
