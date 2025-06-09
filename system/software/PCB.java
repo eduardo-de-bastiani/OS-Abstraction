@@ -21,9 +21,9 @@ public class PCB {
     }
 
     private void saveRegisters(int[] _reg) {
-        for (int i = 0; i < reg.length; i++) {
-            System.out.println("Saving register " + i + ": " + _reg[i]);
-        }
+        // for (int i = 0; i < reg.length; i++) {
+        //     System.out.println("Saving register " + i + ": " + _reg[i]);
+        // }
         reg = _reg.clone();
     }
 
