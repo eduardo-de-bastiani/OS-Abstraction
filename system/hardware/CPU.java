@@ -283,10 +283,11 @@ public class CPU implements Runnable {
 
                     // Chamadas de sistema
                     case SYSCALL:
+                        pc++;
                         sysCall.handle(); // <<<<< aqui desvia para rotina de chamada de sistema, no momento so
                         // temos IO
                         //sys.so.pm.setBlockedProcess(sys.hw);
-                        pc++;
+                        
                         break;
 
                     case STOP: // por enquanto, para execucao

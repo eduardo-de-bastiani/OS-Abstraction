@@ -15,6 +15,7 @@ public class InputDevice {
     }
 
     public synchronized Integer readFromQueue() {
+        System.err.println("Waiting for input... ------------------------");
         while (queue.isEmpty()) {
             try {
                 wait();
@@ -23,6 +24,7 @@ public class InputDevice {
                 return null;
             }
         }
+        System.out.println("read from queue: " + queue.peek());
         return queue.poll();
     }
 
