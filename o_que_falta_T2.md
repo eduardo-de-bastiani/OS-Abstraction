@@ -7,7 +7,7 @@
 - quando um processo solicita acesso a um dispositivo de I/O, devem ocorrer as seguintes ações: 
 1. O processo deve ser movido para bloqueado. ✅
 2. Outro processo deve ser escalonado. ✅
-3. O pedido de I/O deve ser despachado para fila do dispositivo e a operação realizada no mesmo. ✅ 
+3. O pedido de I/O deve ser despachado para fila do dispositivo e a operação realizada no mesmo. 
 
 As ações devem ser realizadas concorrentemente, com *multithreading* ✅
 
