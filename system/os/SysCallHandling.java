@@ -34,15 +34,15 @@ public class SysCallHandling {
 
             // leitura - le a entrada do teclado do usuario e guarda em reg[9]
             // Cria uma thread para realizar a leitura de forma assíncrona
-            
-            // Thread ioThread = new Thread(() -> {
+
+            Thread ioThread = new Thread(() -> {
                 System.out.println("IN: Leitura do teclado (Use o comando IN, com o input em seguida): ");
                 int input = InputDevice.getInstance().readFromQueue();
                 hw.mem.pos[current.reg[9]].p = input; // armazena o valor lido na posicao de memoria indicada por reg[9]
                 hw.sistema.so.pm.removeBlockedProcess(current);
                 System.out.println("Entrada lida: " + input);
-            // });
-            // ioThread.start();
+            });
+            ioThread.start();
 
             // armazena a entrada no reg[9]
         } else if (hw.cpu.reg[8] == 2) {
