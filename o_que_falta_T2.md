@@ -1,6 +1,6 @@
 ##  O que precisamos fazer
 
-### <ins>Entrada e Saída
+### <ins>Entrada e Saída ✅
 
 #### Movimentação dos processos para fila de bloqueados automaticamente
 
@@ -13,7 +13,7 @@ As ações devem ser realizadas concorrentemente, com *multithreading* ✅
 
 #### Criar dispositivo de I/O ✅
 
-#### Interrupção de finalização de I/O
+#### Interrupção de finalização de I/O ✅
 
 - Devemos criar uma variável na CPU para que o dispositivo de I/O sinalize a interrupção.
 - O processo que estava bloqueado deve ser movido para a fila de prontos para ser escalonado novamente.
