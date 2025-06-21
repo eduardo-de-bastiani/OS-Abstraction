@@ -27,7 +27,8 @@ public class InterruptHandling {
             }
             // Add logic to handle intInstrucaoInvalida
             case pageFault -> {
-                
+                System.out.println("Handling pageFault interrupt");
+                hw.sistema.so.mm.handlePageFaultInterrupt(hw);
             }
 
             default -> System.out.println("Unknown interrupt");

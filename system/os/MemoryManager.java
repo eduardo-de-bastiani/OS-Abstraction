@@ -1,9 +1,11 @@
 package system.os;
 
 import java.util.*;
+
+import system.hardware.HW;
 import system.hardware.Memory;
 import system.hardware.Word;
-import system.software.Clock; //vlw
+import system.software.Clock;
 import system.software.ProcessManager;
 
 public class MemoryManager {
@@ -246,6 +248,8 @@ public class MemoryManager {
         if (enderecoLogico >= 0 && enderecoLogico < mem.pos.length){
             int pageIndex = enderecoLogico / pageSize; // Calcula o índice da página
             pages[pageIndex][1] = true; // Marca a página como acessada
+
+            clock.markFrameAccessed(pageIndex);
         } else {
             throw new IllegalArgumentException("Endereço de programa inválido: " + enderecoLogico);
         }
@@ -278,5 +282,30 @@ public class MemoryManager {
             }
         }
         return allocated;
+    }
+
+    public void handlePageFaultInterrupt(HW hw) {
+        System.out.println("Handling page fault interrupt");
+        
+        int currentLogicalPc = hw.cpu.pc;
+        int currentSecMemPageIndex = pm.processRunning.pageTable[0][currentLogicalPc];
+
+        //TODO: atualizar tabela de páginas dos processos trocados
+
+        swapFrames(clock.getNextFrame(), currentSecMemPageIndex);
+    }
+
+    public void swapFrames(int memFrameIndex, int secMemFrameIndex) {
+        int startSecMemAddress = secMemFrameIndex * pageSize; // Endereço inicial da página
+        int startMemAddress = memFrameIndex * pageSize; // Endereço inicial da página
+
+        for (int offset = 0; offset < pageSize; offset++) {
+            int currentMemAddress = startMemAddress + offset;
+            int currentSecMemAddress = startSecMemAddress + offset;
+            
+            Word temp = mem.pos[currentMemAddress];
+            mem.pos[currentMemAddress] = secMem.pos[currentSecMemAddress];
+            secMem.pos[currentSecMemAddress] = temp;
+        }
     }
 }
