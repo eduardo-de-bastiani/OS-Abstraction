@@ -48,7 +48,7 @@ public class Utilities {
     }
 
     public void loadAndExec(Word[] p) {
-        mm.aloca(p); // carga do programa na memoria
+        mm.alocaPrograma(p); // carga do programa na memoria
         System.out.println("---------------------------------- programa carregado na memoria");
         dump(0, p.length); // dump da memoria nestas posicoes
         hw.cpu.setContext(0); // seta pc para endereço 0 - ponto de entrada dos programas

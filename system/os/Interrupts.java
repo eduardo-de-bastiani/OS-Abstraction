@@ -1,5 +1,5 @@
 package system.os;
 
 public enum Interrupts {
-    noInterrupt, intEnderecoInvalido, intInstrucaoInvalida, intOverflow, intSTOP, quantumTime;
+    noInterrupt, intEnderecoInvalido, intInstrucaoInvalida, intOverflow, intSTOP, quantumTime, pageFault;
 }

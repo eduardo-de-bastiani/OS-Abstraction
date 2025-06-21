@@ -1,5 +1,7 @@
 package system.hardware;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import system.core.Sistema;
 import system.os.InterruptHandling;
 import system.os.Interrupts;
@@ -31,6 +33,8 @@ public class CPU implements Runnable {
     // nesta versao acaba o sistema no fim do prog
 
     public boolean waitOnInstruction = true; // flag para esperar após cada instrução
+
+    private final Queue<Interrupts> interruptQueue = new LinkedList<>();
 
     // auxilio aa depuração
     private Sistema sys;
@@ -74,14 +78,16 @@ public class CPU implements Runnable {
         if (e >= 0 && e < m.length) {
             return true;
         } else {
-            irpt = Interrupts.intEnderecoInvalido; // se nao for liga interrupcao no meio da exec da instrucao
+             interruptQueue.add(Interrupts.intEnderecoInvalido);// adiciona a interrupção de end invalido na fila de handler
+            //irpt = Interrupts.intEnderecoInvalido; // se nao for liga interrupcao no meio da exec da instrucao
             return false;
         }
     }
 
     private boolean testOverflow(int v) { // toda operacao matematica deve avaliar se ocorre overflow
         if ((v < minInt) || (v > maxInt)) {
-            irpt = Interrupts.intOverflow; // se houver liga interrupcao no meio da exec da instrucao
+            interruptQueue.add(Interrupts.intOverflow); // se houver liga interrupcao no meio da exec da instrucao
+            //irpt = Interrupts.intOverflow; // se houver liga interrupcao no meio da exec da instrucao
             return false;
         }
         ;
@@ -91,7 +97,8 @@ public class CPU implements Runnable {
     public void setContext(int _pc) { // usado para setar o contexto da cpu para rodar um processo
         // [ nesta versao é somente colocar o PC na posicao 0 ]
         pc = _pc; // pc cfe endereco logico
-        irpt = Interrupts.noInterrupt; // reset da interrupcao registrada
+        //irpt = Interrupts.noInterrupt; // reset da interrupcao registrada
+        interruptQueue.clear(); // limpar interrupções pendentes ao iniciar novo contexto
     }
 
     @Override
@@ -113,7 +120,12 @@ public class CPU implements Runnable {
             }
             
             if (legal(pc)) {
-                ir = m[mm.mmu(pc)];
+                int enderecoFisico = mm.mmu(pc); // traduz o endereco logico do pc para fisico
+                if (enderecoFisico == -1){
+                    irpt = Interrupts.pageFault;
+                    break;
+                }
+                ir = m[enderecoFisico];
                 if (debug) {
                     System.out.print("                                              regs: ");
                     for (int i = 0; i < 10; i++) {
@@ -133,6 +145,10 @@ public class CPU implements Runnable {
                         break;
                     case LDD:
                         int enderecoFisicoLDD = mm.mmu(ir.p);
+                        if (enderecoFisicoLDD == -1) {
+                            irpt = Interrupts.pageFault; // se nao for valido, liga interrupcao de page fault
+                            break;
+                        }
                         if (legal(enderecoFisicoLDD)) {
                             reg[ir.ra] = m[enderecoFisicoLDD].p;
                             pc++;
@@ -140,6 +156,10 @@ public class CPU implements Runnable {
                         break;
                     case LDX: // RD <- [RS] // NOVA
                         int enderecoFisicoLDX = mm.mmu(reg[ir.rb]);
+                        if (enderecoFisicoLDX == -1) {
+                            irpt = Interrupts.pageFault; // se nao for valido, liga interrupcao de page fault
+                            break;
+                        }
                         if (legal(enderecoFisicoLDX)) {
                             reg[ir.ra] = m[enderecoFisicoLDX].p;
                             pc++;
@@ -147,6 +167,10 @@ public class CPU implements Runnable {
                         break;
                     case STD: // [A] ← Rs
                         int enderecoFisicoSTD = mm.mmu(ir.p);
+                        if (enderecoFisicoSTD == -1) {
+                            irpt = Interrupts.pageFault; // se nao for valido, liga interrupcao de page fault
+                            break;
+                        }
                         if (legal(enderecoFisicoSTD)) {
                             m[enderecoFisicoSTD].opc = Opcode.DATA;
                             m[enderecoFisicoSTD].p = reg[ir.ra];
@@ -159,6 +183,10 @@ public class CPU implements Runnable {
                         break;
                     case STX: // [Rd] ←Rs
                         int enderecoFisicoSTX = mm.mmu(reg[ir.ra]);
+                        if (enderecoFisicoSTX == -1) {
+                            irpt = Interrupts.pageFault; // se nao for valido, liga interrupcao de page fault
+                            break;
+                        }
                         if (legal(enderecoFisicoSTX)) {
                             m[enderecoFisicoSTX].opc = Opcode.DATA;
                             m[enderecoFisicoSTX].p = reg[ir.rb];
@@ -278,7 +306,7 @@ public class CPU implements Runnable {
 
                     case DATA: // pc está sobre área supostamente de dados
                         System.out.println("pc está sobre área supostamente de dados");
-                        irpt = Interrupts.intInstrucaoInvalida;
+                        interruptQueue.add(Interrupts.intInstrucaoInvalida);
                         break;
 
                     // Chamadas de sistema
@@ -292,24 +320,33 @@ public class CPU implements Runnable {
 
                     case STOP: // por enquanto, para execucao
                         sysCall.stop();
-                        irpt = Interrupts.intSTOP;
+                        //irpt = Interrupts.intSTOP;
+                        interruptQueue.add(Interrupts.intSTOP);
                         break;
                     // Inexistente
                     default:
                         System.out.println("Instrução inexistente: " + ir.opc);
-                        irpt = Interrupts.intInstrucaoInvalida;
+                        //irpt = Interrupts.intInstrucaoInvalida;
+                        interruptQueue.add(Interrupts.intInstrucaoInvalida);
                         break;
                 }
             }
 
             if (scheduler.notifyInstructionExecuted()){
                 // Se o quantum foi completado, gera uma interrupção
-                irpt = Interrupts.quantumTime;
+                 interruptQueue.add(Interrupts.quantumTime);
+
+                // Visualizar frames alocados pelos processos
+                if (debug) {
+                    System.out.println("--- Frames alocados após instrução ---");
+                    mm.getAllocatedFrames().forEach(frame -> System.out.println("Frame " + frame));
+                }
             }
 
-            if (irpt != Interrupts.noInterrupt) {
-                ih.handle(irpt);
-                irpt = Interrupts.noInterrupt; // reset da interrupcao
+             // processar todas as interrupções pendentes
+            while (!interruptQueue.isEmpty()) {
+                Interrupts pending = interruptQueue.poll();
+                ih.handle(pending); // reset da interrupcao
             }
         }
     }

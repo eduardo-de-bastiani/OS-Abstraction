@@ -19,7 +19,7 @@ public class SO {
         hw.cpu.setAddressOfHandlers(ih, sc);
         pm = new ProcessManager(quantum);
         sca = pm.Scheduler;
-        mm = new MemoryManager(tamMem, pageSize, hw.mem, pm);
+        mm = new MemoryManager(tamMem, pageSize, hw.mem, hw.secMem,  pm);
         pm.memoryManager = mm; // gerenciador de processos tem acesso ao mm
         utils = new Utilities(hw, mm); // utilitários do sistema
 

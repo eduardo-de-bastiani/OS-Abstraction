@@ -2,7 +2,6 @@ package system.software;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import system.hardware.HW;
 import system.os.MemoryManager;
 
@@ -28,7 +27,7 @@ public class ProcessManager {
     }
 
     public boolean createProcess(Program p) {
-        int[] pageTable = memoryManager.aloca(p.image);
+        int[][] pageTable = memoryManager.alocaPrograma(p.image);
         
         idCounter++;
         PCB pcb = new PCB(idCounter, pageTable, p.name, memoryManager.pageSize);

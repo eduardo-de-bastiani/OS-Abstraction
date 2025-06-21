@@ -11,7 +11,7 @@ public class HW {
     public HW(int tamMem, Sistema sistema) {
         this.sistema = sistema;
         mem = new Memory(tamMem);
-        secMem = new Memory(tamMem / 2);
+        secMem = new Memory(tamMem * 4);
         cpu = new CPU(mem, true, sistema); // true liga debug
     }
 }

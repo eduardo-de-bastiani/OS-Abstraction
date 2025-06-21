@@ -26,6 +26,9 @@ public class InterruptHandling {
                 hw.sistema.so.sca.handleStopInterrupt(hw);
             }
             // Add logic to handle intInstrucaoInvalida
+            case pageFault -> {
+                
+            }
 
             default -> System.out.println("Unknown interrupt");
         }

@@ -129,11 +129,11 @@ public class Commands {
             
             // Exibe memória de todas as páginas alocadas ao processo
             if (pcb.pageTable != null && pcb.pageTable.length > 0) {
-                int pageSize = sys.so.mm.pages.length > 0 ? sys.hw.mem.pos.length / sys.so.mm.pages.length : 16;
+                int pageSize = sys.so.mm.pageSize;
                 System.out.println("Memória alocada ao processo (páginas: " + pcb.pageTable.length + "):");
                 
                 for (int i = 0; i < pcb.pageTable.length; i++) {
-                    int frameNumber = pcb.pageTable[i];
+                    int frameNumber = pcb.pageTable[i][0];
                     int startAddr = frameNumber * pageSize;
                     int endAddr = startAddr + pageSize;
                     
