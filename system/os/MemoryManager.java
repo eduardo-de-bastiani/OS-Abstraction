@@ -281,11 +281,11 @@ public class MemoryManager {
         int[][] tabelaDePaginas = pm.processRunning.pageTable;
 
         // Verifica se o endereço lógico está no range das tabelas alocadass
-        if (enderecoLogico < 0 || enderecoLogico >= tabelaDePaginas.length * pageSize) {
-            throw new IllegalArgumentException(
-                "Endereço lógico " + enderecoLogico + " fora do intervalo das tabelas de páginas (" + (tabelaDePaginas.length * pageSize) + ")"
-                );
-        }
+        // if (enderecoLogico < 0 || enderecoLogico >= tabelaDePaginas.length * pageSize) {
+        //     throw new IllegalArgumentException(
+        //         "Endereço lógico " + enderecoLogico + " fora do intervalo das tabelas de páginas (" + (tabelaDePaginas.length * pageSize) + ")"
+        //         );
+        // }
 
         // Calcula o índice da página e o deslocamento dentro da página
         int indicePagina = enderecoLogico / pageSize;
