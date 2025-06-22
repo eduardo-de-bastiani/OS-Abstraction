@@ -137,8 +137,11 @@ public class Commands {
                     int startAddr = frameNumber * pageSize;
                     int endAddr = startAddr + pageSize;
                     
-                    System.out.println("------ Página Lógica " + i + " -> Frame Físico " + frameNumber + " ------");
-                    sys.so.utils.dump(startAddr, endAddr);
+                    if (frameNumber != -1){
+                        System.out.println("------ Página Lógica " + i + " -> Frame Físico " + frameNumber + " da memoória principal ------");
+                        sys.so.utils.dump(startAddr, endAddr);
+                    }
+                    
                 }
             } else {
                 System.out.println("Processo não possui memória alocada.");

@@ -14,7 +14,7 @@ public class ProcessManager {
     public Scheduler Scheduler;
 
     //retorna a juncao de todas as listas de processos (bloqueando, pronto e rodando)
-    private List<PCB> getAllProcesses() {
+    public List<PCB> getAllProcesses() {
         List<PCB> all = new ArrayList<>();
         all.addAll(processReady);
         all.addAll(processBlocked);

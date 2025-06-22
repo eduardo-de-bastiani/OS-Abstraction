@@ -1,11 +1,11 @@
 package system.os;
 
 import java.util.*;
-
 import system.hardware.HW;
 import system.hardware.Memory;
 import system.hardware.Word;
 import system.software.Clock;
+import system.software.PCB;
 import system.software.ProcessManager;
 
 public class MemoryManager {
@@ -15,7 +15,7 @@ public class MemoryManager {
     private Memory mem; // Memória física
     private Memory secMem;
     private ProcessManager pm; // Gerenciador de 
-    private int allocMethod = 1; // Método de alocação (0 = first fit, 1 = random fit, 2 = on demand)
+    private int allocMethod = 2; // Método de alocação (0 = first fit, 1 = random fit, 2 = on demand)
     private Clock clock; // Algoritmo de substituição de páginas do relógio
 
     public MemoryManager(int tamMem, int pageSize, Memory mem, Memory secMem, ProcessManager pm) {
@@ -50,19 +50,33 @@ public class MemoryManager {
         int qtdWords = p.length; // Quantidade de palavras a serem alocadas
         int qtdPages = (int) Math.ceil((double) qtdWords / pageSize); // Calcula o número de páginas necessárias
         int[][] allocatedPages = new int[qtdPages][2]; // Array para armazenar as páginas alocadas
+        for (int[] allocatedPage : allocatedPages) {
+            allocatedPage[0] = -1; // Inicializa a coluna de memória principal com -1
+            allocatedPage[1] = -1; // Inicializa a coluna de memória secundária com -1
+        }
+
         int allocatedCount = 0; // Contador de páginas alocadas
 
         //Verifica a quantidade de páginas disponíveis
-        int qtdAvailablePages = 0;
+        int qtdPaginasLivresMemPrincipal = 0;
+        int qtdPaginasLivreMemSecundaria = 0;
         for (boolean[] page : this.pages) {
             if (!page[0]) { // Se a página não está alocada
-                qtdAvailablePages++;
+                qtdPaginasLivresMemPrincipal++;
             }
         }
 
-        if (qtdAvailablePages < qtdPages && allocMethod != 2) {
+        for (boolean pageSec : this.pagesSec) {
+            if (!pageSec) { // Se a página não está alocada na memória secundária
+                qtdPaginasLivreMemSecundaria++;
+            }
+        }
+
+        if (qtdPaginasLivresMemPrincipal < qtdPages && allocMethod != 2) {
             throw new OutOfMemoryError("Não há memória suficiente para alocar o programa.");
         }
+
+        
 
         switch (allocMethod) {
             case 0 -> { // Percorre as páginas disponíveis para encontrar espaço usando "first fit"
@@ -107,7 +121,7 @@ public class MemoryManager {
                 throw new OutOfMemoryError("Não há memória suficiente para alocar o programa.");
             }
             case 1 -> { // Aloca as páginas de forma aleatória
-                int[] freePages = new int[qtdAvailablePages]; // Array para armazenar as páginas livres
+                int[] freePages = new int[qtdPaginasLivresMemPrincipal]; // Array para armazenar as páginas livres
 
                 for (int i = 0, j = 0; i < pages.length; i++) {
                     if (!pages[i][0]) { // Página livre
@@ -153,32 +167,87 @@ public class MemoryManager {
             case 2 -> { // Aloca apenas a primeira página do processo na memória principal, as demais serão carregadas para a memoria secundária
 
                 //Todo alterar a lógica ainda para carregar as páginas para a memória secundária
-                if(qtdAvailablePages < 1) {
-                    throw new OutOfMemoryError("Não há memória suficiente para alocar o programa.");
+                if(qtdPaginasLivresMemPrincipal < 1) {
+                    throw new OutOfMemoryError("Não há memória suficiente para criar um novo processo.");
                 }
+                if (qtdPaginasLivreMemSecundaria < qtdPages - 1) {
+                    throw new OutOfMemoryError("Não há memória secundária suficiente para criar um novo programa.");
+                }
+
                 for (int i = 0; i < pages.length; i++) {
                     if (!pages[i][0]) { // Página livre
                         pages[i][0] = true; // Marca a página como alocada
                         allocatedPages[allocatedCount][0] = i; // Armazena a página alocada
-                        allocatedPages[allocatedCount][1] = -1; // Marca a página como não alocada na memória secundária
+                        System.out.println("Alocando página" + allocatedCount + "no frame " + i + "da memória principal.");
                         allocatedCount++;
-
-                        System.out.println("Alocando página " + i + " na memória.");
-
-                        // Copia o conteúdo para a memória
+                        
+                        // Copia o conteúdo para a memória principal
                         int startAddress = i * pageSize; // Endereço inicial da página
-                        for (int offset = 0; offset < pageSize && offset < qtdWords; offset++) {
+                        for (int offset = 0; offset < pageSize; offset++) {
+                            int wordIndex = offset;
+                            if (wordIndex >= qtdWords) {
+                                break;
+                            }
                             mem.pos[startAddress + offset] = new Word(
-                                    p[offset].opc,
-                                    p[offset].ra,
-                                    p[offset].rb,
-                                    p[offset].p);
+                                    p[wordIndex].opc,
+                                    p[wordIndex].ra,
+                                    p[wordIndex].rb,
+                                    p[wordIndex].p);
                         }
-
-                        return allocatedPages; // Retorna o array de páginas alocadas
+                        break; // Sai do loop após alocar a primeira página
                     }
                 }
-                
+                // Aloca as demais páginas na memória secundária
+                for (int i = 1; i < qtdPages; i++) {
+                    for (int j = 0; j < pagesSec.length; j++) {
+                        if (!pagesSec[j]) { // Página livre na memória secundária
+                            pagesSec[j] = true; // Marca a página como alocada na memória secundária
+                            allocatedPages[allocatedCount][1] = j; // Armazena o frame da memória secundária
+                            System.out.println("Alocando página " + i + " no frame " + j + " da memória secundária.");
+                            allocatedCount++;
+
+                            // Copia o conteúdo para a memória secundária
+                            int startAddress = j * pageSize; // Endereço inicial da página na memória secundária
+                            for (int offset = 0; offset < pageSize; offset++) {
+                                int wordIndex = i * pageSize + offset;
+                                if (wordIndex >= qtdWords) {
+                                    break;
+                                }
+                                secMem.pos[startAddress + offset] = new Word(
+                                        p[wordIndex].opc,
+                                        p[wordIndex].ra,
+                                        p[wordIndex].rb,
+                                        p[wordIndex].p);
+                            }
+                            break; // Sai do loop após alocar a página na memória secundária
+                        }
+                    }
+                }
+
+                if (allocatedCount == qtdPages) {
+                    // System.out.println("Páginas alocadas:");
+                    // for (int i = 0; i < allocatedCount; i++) {
+                    //      String local = (i == 0) ? "Memória Principal" : "Memória Secundária";
+                    //      int frame = (i == 0) ? allocatedPages[i][0] : allocatedPages[i][1];
+                    //     System.out.println("Página " + i + " -> Frame " + frame + " em " + local);
+                    // }
+
+                    for (int i = 0; i < allocatedCount; i++) {
+                        System.out.println("Página " + i + " -> Frame " + allocatedPages[i][0] + " na memória principal e Frame " + allocatedPages[i][1] + " na memória secundária");
+                    }
+
+                    return allocatedPages; // Retorna o array de páginas alocadas
+                }else {
+                    // Se não foi possível alocar todas as páginas, desaloca as páginas alocadas
+                    for (int j = 0; j < allocatedCount; j++) {
+                        pages[allocatedPages[j][0]][0] = false; // Marca a página como livre na memória principal
+                        if (allocatedPages[j][1] >= 0) {
+                            pagesSec[allocatedPages[j][1]] = false; // Marca a página como livre na memória secundária
+                        }
+                    }
+
+                }
+
             }
         }
 
@@ -224,6 +293,7 @@ public class MemoryManager {
 
         // Obtém o frame físico correspondente
         int frameFisico = tabelaDePaginas[indicePagina][0];
+        System.out.println("Endereço lógico: " + enderecoLogico + ", Página: " + indicePagina + ", Frame físico: " + frameFisico + ", Deslocamento: " + deslocamento);
 
         if (frameFisico == -1) {
             //Aciona interrupção por page fault
@@ -286,18 +356,55 @@ public class MemoryManager {
 
     public void handlePageFaultInterrupt(HW hw) {
         System.out.println("Handling page fault interrupt");
-        
+
+        PCB current = hw.sistema.so.pm.processRunning;
+        System.out.println("Current process: " + current.pid + " - " + current.programName);
         int currentLogicalPc = hw.cpu.pc;
-        int currentSecMemPageIndex = pm.processRunning.pageTable[0][currentLogicalPc];
 
-        //TODO: atualizar tabela de páginas dos processos trocados
+        hw.sistema.so.pm.setBlockedProcess(hw);
+            Thread ioThread = new Thread(() -> {
+                int pageIndex = currentLogicalPc / pageSize; // Calcula o índice da página a partir do PC
+                int currentSecMemPageIndex = current.pageTable[pageIndex][1];
+                int mainMemPageKilled = clock.getNextFrame(); // Obtém o próximo frame a ser substituído na memória principal
+                PCB ownerOfKilledPage =  getProcessOwnerFrame(mainMemPageKilled); // Obtém o processo dono do frame que será substituído
 
-        swapFrames(clock.getNextFrame(), currentSecMemPageIndex);
+                
+                
+                boolean swapOK = swapFrames(mainMemPageKilled, currentSecMemPageIndex);
+                
+                if (!swapOK) {
+                    throw new RuntimeException("Erro ao trocar frames entre memória principal e secundária.");
+                } else {
+                    for (int[] pageTable : pm.processRunning.pageTable) {
+                        if (pageTable[0] == mainMemPageKilled) {
+                            pageTable[0] = -1; // Marca a página como não alocada
+                            // Marca a página como não alocada
+                            pageTable[1] = currentSecMemPageIndex; // Atualiza a página na memória secundária
+                            // Atualiza a página na memória secundária
+                            break;
+                        }
+                    }
+
+                    current.pageTable[pageIndex][0] = mainMemPageKilled; // Atualiza a tabela de páginas do processo atual
+                    current.pageTable[pageIndex][1] = -1;
+
+                    //Atualizar o PCB do processo que teve a página substituída
+                }
+
+                hw.sistema.so.pm.removeBlockedProcess(current);
+
+            });
+            ioThread.start();
+
+
+
     }
 
-    public void swapFrames(int memFrameIndex, int secMemFrameIndex) {
+    public boolean swapFrames(int memFrameIndex, int secMemFrameIndex) {
         int startSecMemAddress = secMemFrameIndex * pageSize; // Endereço inicial da página
         int startMemAddress = memFrameIndex * pageSize; // Endereço inicial da página
+
+        System.out.println("Swap frames: Memória Principal Frame " + memFrameIndex + " <-> Memória Secundária Frame " + secMemFrameIndex);
 
         for (int offset = 0; offset < pageSize; offset++) {
             int currentMemAddress = startMemAddress + offset;
@@ -307,5 +414,19 @@ public class MemoryManager {
             mem.pos[currentMemAddress] = secMem.pos[currentSecMemAddress];
             secMem.pos[currentSecMemAddress] = temp;
         }
+
+        return true;
+    }
+
+    public PCB getProcessOwnerFrame(int mainMemoryFrame) {
+        for (PCB p : pm.getAllProcesses()) {
+            for (int[] page : p.pageTable) {
+                if (page[0] == mainMemoryFrame) {
+                    return p; // Retorna o PID do processo dono do frame
+                }
+            }
+        }
+        return null;
     }
 }
+

@@ -122,8 +122,8 @@ public class CPU implements Runnable {
             if (legal(pc)) {
                 int enderecoFisico = mm.mmu(pc); // traduz o endereco logico do pc para fisico
                 if (enderecoFisico == -1){
+                    System.out.println("Page Fault: Endereço lógico " + pc + " não mapeado.");
                     interruptQueue.add(Interrupts.pageFault);
-                    break;
                 }
                 ir = m[enderecoFisico];
                 if (debug) {
@@ -137,8 +137,9 @@ public class CPU implements Runnable {
                     System.out.print("                      pc: " + pc + "       exec: ");
                     u.dump(ir);
                 }
+                if(interruptQueue.isEmpty()) { // se nao houver interrupcao pendente, executa a instrucao
+                    switch (ir.opc) {
 
-                switch (ir.opc) {
                     case LDI:
                         reg[ir.ra] = ir.p;
                         pc++;
@@ -329,6 +330,7 @@ public class CPU implements Runnable {
                         //irpt = Interrupts.intInstrucaoInvalida;
                         interruptQueue.add(Interrupts.intInstrucaoInvalida);
                         break;
+                }
                 }
             }
 

@@ -23,7 +23,7 @@ As ações devem ser realizadas concorrentemente, com *multithreading* ✅
 
 ### <ins>Memória Virtual
 
-#### Carregar somente uma página na memória
+#### Carregar somente uma página na memória ✅
 
 - apenas a primeira página de um programa deve ser carregada na memória (para acontecer page-faults) 
 
@@ -61,7 +61,7 @@ Essa informação deve estar na *tabela de páginas.*
 - Fim do carregamento da página ao quadro da Mem (que estava no disco)
 	+ passa o processo da fila de bloqueados para pronto (fim do tratamento de page-fault)
 
-#### Adicionar lista de interrupções ✅ps:Decidindo se vamos usar
+#### Adicionar lista de interrupções ✅
 - várias interrupções podem ocorrer ao mesmo tempo
 - precisamos armazenar as interrupções em uma lista ou fila para tratamento
 
