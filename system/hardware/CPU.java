@@ -3,10 +3,7 @@ package system.hardware;
 import java.util.LinkedList;
 import java.util.Queue;
 import system.core.Sistema;
-import system.os.InterruptHandling;
-import system.os.Interrupts;
-import system.os.MemoryManager;
-import system.os.SysCallHandling;
+import system.os.*;
 import system.software.Opcode;
 import system.software.Scheduler;
 import system.utils.Utilities;
@@ -34,7 +31,7 @@ public class CPU implements Runnable {
 
     public boolean waitOnInstruction = true; // flag para esperar após cada instrução
 
-    private final Queue<Interrupts> interruptQueue = new LinkedList<>();
+    private final Queue<InterruptInfo> interruptQueue = new LinkedList<>();
 
     // auxilio aa depuração
     private Sistema sys;
@@ -78,7 +75,7 @@ public class CPU implements Runnable {
         if (e >= 0 && e < m.length) {
             return true;
         } else {
-             interruptQueue.add(Interrupts.intEnderecoInvalido);// adiciona a interrupção de end invalido na fila de handler
+             interruptQueue.add(new InterruptInfo(Interrupts.intEnderecoInvalido, -1));// adiciona a interrupção de end invalido na fila de handler
             //irpt = Interrupts.intEnderecoInvalido; // se nao for liga interrupcao no meio da exec da instrucao
             return false;
         }
@@ -86,7 +83,7 @@ public class CPU implements Runnable {
 
     private boolean testOverflow(int v) { // toda operacao matematica deve avaliar se ocorre overflow
         if ((v < minInt) || (v > maxInt)) {
-            interruptQueue.add(Interrupts.intOverflow); // se houver liga interrupcao no meio da exec da instrucao
+            interruptQueue.add(new InterruptInfo(Interrupts.intOverflow, -1)); // se houver liga interrupcao no meio da exec da instrucao
             //irpt = Interrupts.intOverflow; // se houver liga interrupcao no meio da exec da instrucao
             return false;
         }
@@ -123,19 +120,21 @@ public class CPU implements Runnable {
                 int enderecoFisico = mm.mmu(pc); // traduz o endereco logico do pc para fisico
                 if (enderecoFisico == -1){
                     System.out.println("Page Fault: Endereço lógico " + pc + " não mapeado.");
-                    interruptQueue.add(Interrupts.pageFault);
-                }
-                ir = m[enderecoFisico];
-                if (debug) {
-                    System.out.print("                                              regs: ");
-                    for (int i = 0; i < 10; i++) {
-                        System.out.print(" r[" + i + "]:" + reg[i]);
+                    interruptQueue.add(new InterruptInfo(Interrupts.pageFault, pc));
+
+                }else {
+                    ir = m[enderecoFisico];
+                    if (debug) {
+                        System.out.print("                                              regs: ");
+                        for (int i = 0; i < 10; i++) {
+                            System.out.print(" r[" + i + "]:" + reg[i]);
+                        }
+                        System.out.println();
                     }
-                    System.out.println();
-                }
-                if (debug) {
-                    System.out.print("                      pc: " + pc + "       exec: ");
-                    u.dump(ir);
+                    if (debug) {
+                        System.out.print("                      pc: " + pc + "       exec: ");
+                        u.dump(ir);
+                    }
                 }
                 if(interruptQueue.isEmpty()) { // se nao houver interrupcao pendente, executa a instrucao
                     switch (ir.opc) {
@@ -147,7 +146,7 @@ public class CPU implements Runnable {
                     case LDD:
                         int enderecoFisicoLDD = mm.mmu(ir.p);
                         if (enderecoFisicoLDD == -1) {
-                            interruptQueue.add(Interrupts.pageFault);
+                            interruptQueue.add(new InterruptInfo(Interrupts.pageFault, ir.p));
                             break;
                         }
                         if (legal(enderecoFisicoLDD)) {
@@ -158,7 +157,7 @@ public class CPU implements Runnable {
                     case LDX: // RD <- [RS] // NOVA
                         int enderecoFisicoLDX = mm.mmu(reg[ir.rb]);
                         if (enderecoFisicoLDX == -1) {
-                            interruptQueue.add(Interrupts.pageFault);
+                            interruptQueue.add(new InterruptInfo(Interrupts.pageFault, reg[ir.rb]));
                             break;
                         }
                         if (legal(enderecoFisicoLDX)) {
@@ -169,7 +168,7 @@ public class CPU implements Runnable {
                     case STD: // [A] ← Rs
                         int enderecoFisicoSTD = mm.mmu(ir.p);
                         if (enderecoFisicoSTD == -1) {
-                            interruptQueue.add(Interrupts.pageFault);
+                            interruptQueue.add(new InterruptInfo(Interrupts.pageFault, ir.p));
                             break;
                         }
                         if (legal(enderecoFisicoSTD)) {
@@ -185,7 +184,7 @@ public class CPU implements Runnable {
                     case STX: // [Rd] ←Rs
                         int enderecoFisicoSTX = mm.mmu(reg[ir.ra]);
                         if (enderecoFisicoSTX == -1) {
-                            interruptQueue.add(Interrupts.pageFault);
+                            interruptQueue.add(new InterruptInfo(Interrupts.pageFault, reg[ir.ra]));
                             break;
                         }
                         if (legal(enderecoFisicoSTX)) {
@@ -307,7 +306,7 @@ public class CPU implements Runnable {
 
                     case DATA: // pc está sobre área supostamente de dados
                         System.out.println("pc está sobre área supostamente de dados");
-                        interruptQueue.add(Interrupts.intInstrucaoInvalida);
+                        interruptQueue.add(new InterruptInfo(Interrupts.intInstrucaoInvalida, -1));
                         break;
 
                     // Chamadas de sistema
@@ -322,13 +321,13 @@ public class CPU implements Runnable {
                     case STOP: // por enquanto, para execucao
                         sysCall.stop();
                         //irpt = Interrupts.intSTOP;
-                        interruptQueue.add(Interrupts.intSTOP);
+                        interruptQueue.add(new InterruptInfo(Interrupts.intSTOP, -1));
                         break;
                     // Inexistente
                     default:
                         System.out.println("Instrução inexistente: " + ir.opc);
                         //irpt = Interrupts.intInstrucaoInvalida;
-                        interruptQueue.add(Interrupts.intInstrucaoInvalida);
+                        interruptQueue.add(new InterruptInfo(Interrupts.intInstrucaoInvalida, -1));
                         break;
                 }
                 }
@@ -336,7 +335,7 @@ public class CPU implements Runnable {
 
             if (scheduler.notifyInstructionExecuted()){
                 // Se o quantum foi completado, gera uma interrupção
-                 interruptQueue.add(Interrupts.quantumTime);
+                 interruptQueue.add(new InterruptInfo(Interrupts.quantumTime, -1));
 
                 // Visualizar frames alocados pelos processos
                 if (debug) {
@@ -347,7 +346,7 @@ public class CPU implements Runnable {
 
              // processar todas as interrupções pendentes
             while (!interruptQueue.isEmpty()) {
-                Interrupts pending = interruptQueue.poll();
+                InterruptInfo pending = interruptQueue.poll();
                 ih.handle(pending); // reset da interrupcao
             }
         }

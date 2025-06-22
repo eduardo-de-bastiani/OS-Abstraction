@@ -9,8 +9,8 @@ public class InterruptHandling {
         hw = _hw;
     }
 
-    public void handle(Interrupts irpt) {
-        switch (irpt) {
+    public void handle(InterruptInfo irpt) {
+        switch (irpt.interrupt) {
             case intSTOP -> {
                 System.out.println("Handling intSTOP interrupt");
                 hw.sistema.so.sca.handleStopInterrupt(hw);
@@ -28,12 +28,12 @@ public class InterruptHandling {
             // Add logic to handle intInstrucaoInvalida
             case pageFault -> {
                 System.out.println("Handling pageFault interrupt");
-                hw.sistema.so.mm.handlePageFaultInterrupt(hw);
+                hw.sistema.so.mm.handlePageFaultInterrupt(hw, irpt.endereco);
             }
 
             default -> System.out.println("Unknown interrupt");
         }
 
-        System.out.println("Interrupcao " + irpt + "   pc: " + hw.cpu.pc);
+        System.out.println("Interrupcao " + irpt.interrupt + "   pc: " + hw.cpu.pc);
     }
 }

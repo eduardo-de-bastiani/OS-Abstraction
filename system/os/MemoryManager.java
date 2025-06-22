@@ -354,50 +354,63 @@ public class MemoryManager {
         return allocated;
     }
 
-    public void handlePageFaultInterrupt(HW hw) {
+    public void handlePageFaultInterrupt(HW hw, int endereco) {
         System.out.println("Handling page fault interrupt");
 
         PCB current = hw.sistema.so.pm.processRunning;
         System.out.println("Current process: " + current.pid + " - " + current.programName);
-        int currentLogicalPc = hw.cpu.pc;
-
+        //int currentLogicalPc = hw.cpu.pc;
         hw.sistema.so.pm.setBlockedProcess(hw);
+
             Thread ioThread = new Thread(() -> {
-                int pageIndex = currentLogicalPc / pageSize; // Calcula o índice da página a partir do PC
+                int pageIndex = endereco / pageSize; // Calcula o índice da página a partir do PC
                 int currentSecMemPageIndex = current.pageTable[pageIndex][1];
+                boolean swapOK = false; // Variável para verificar se a troca de frames foi bem-sucedida
+
+                int nextFreePageMainMem = -1; // Variável para armazenar o próximo frame livre na memória principal
+                for (int i = 0; i < pages.length; i++) {
+                    if (!pages[i][0]) { // Se a página não está alocada
+                        nextFreePageMainMem = i; // Armazena o índice do frame livre
+                        break; // Sai do loop após encontrar o primeiro frame livre
+                    }
+                }
+
+                if (nextFreePageMainMem != -1) {
+                    swapOK = swapFrames(nextFreePageMainMem, currentSecMemPageIndex);
+    
+                    if(!swapOK) {
+                        throw new RuntimeException("Erro ao trocar frames entre memória principal e secundária.");
+                    } else {
+                        current.pageTable[pageIndex][0] = nextFreePageMainMem; // Atualiza a tabela de páginas do processo atual
+                        current.pageTable[pageIndex][1] = -1; // Marca a página como não alocada na memória secundária
+                        pages[nextFreePageMainMem][0] = true; // Marca a página como alocada na memória principal
+                    }
+
+                } else {
                 int mainMemPageKilled = clock.getNextFrame(); // Obtém o próximo frame a ser substituído na memória principal
                 PCB ownerOfKilledPage =  getProcessOwnerFrame(mainMemPageKilled); // Obtém o processo dono do frame que será substituído
-
-                
-                
-                boolean swapOK = swapFrames(mainMemPageKilled, currentSecMemPageIndex);
-                
+                swapOK = swapFrames(mainMemPageKilled, currentSecMemPageIndex);
                 if (!swapOK) {
                     throw new RuntimeException("Erro ao trocar frames entre memória principal e secundária.");
                 } else {
-                    for (int[] pageTable : pm.processRunning.pageTable) {
-                        if (pageTable[0] == mainMemPageKilled) {
-                            pageTable[0] = -1; // Marca a página como não alocada
-                            // Marca a página como não alocada
-                            pageTable[1] = currentSecMemPageIndex; // Atualiza a página na memória secundária
-                            // Atualiza a página na memória secundária
-                            break;
-                        }
-                    }
-
                     current.pageTable[pageIndex][0] = mainMemPageKilled; // Atualiza a tabela de páginas do processo atual
                     current.pageTable[pageIndex][1] = -1;
 
-                    //Atualizar o PCB do processo que teve a página substituída
+                    for (int[] pageTable : ownerOfKilledPage.pageTable) {
+                        if (pageTable[0] == mainMemPageKilled) {
+                            pageTable[0] = -1;
+                            pageTable[1] = currentSecMemPageIndex;
+                            pagesSec[currentSecMemPageIndex] = true; 
+                            break;
+                        }
+                    }
                 }
+            }
 
                 hw.sistema.so.pm.removeBlockedProcess(current);
 
             });
             ioThread.start();
-
-
-
     }
 
     public boolean swapFrames(int memFrameIndex, int secMemFrameIndex) {
