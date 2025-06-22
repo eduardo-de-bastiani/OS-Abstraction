@@ -122,7 +122,7 @@ public class CPU implements Runnable {
             if (legal(pc)) {
                 int enderecoFisico = mm.mmu(pc); // traduz o endereco logico do pc para fisico
                 if (enderecoFisico == -1){
-                    irpt = Interrupts.pageFault;
+                    interruptQueue.add(Interrupts.pageFault);
                     break;
                 }
                 ir = m[enderecoFisico];
@@ -146,7 +146,7 @@ public class CPU implements Runnable {
                     case LDD:
                         int enderecoFisicoLDD = mm.mmu(ir.p);
                         if (enderecoFisicoLDD == -1) {
-                            irpt = Interrupts.pageFault; // se nao for valido, liga interrupcao de page fault
+                            interruptQueue.add(Interrupts.pageFault);
                             break;
                         }
                         if (legal(enderecoFisicoLDD)) {
@@ -157,7 +157,7 @@ public class CPU implements Runnable {
                     case LDX: // RD <- [RS] // NOVA
                         int enderecoFisicoLDX = mm.mmu(reg[ir.rb]);
                         if (enderecoFisicoLDX == -1) {
-                            irpt = Interrupts.pageFault; // se nao for valido, liga interrupcao de page fault
+                            interruptQueue.add(Interrupts.pageFault);
                             break;
                         }
                         if (legal(enderecoFisicoLDX)) {
@@ -168,7 +168,7 @@ public class CPU implements Runnable {
                     case STD: // [A] ← Rs
                         int enderecoFisicoSTD = mm.mmu(ir.p);
                         if (enderecoFisicoSTD == -1) {
-                            irpt = Interrupts.pageFault; // se nao for valido, liga interrupcao de page fault
+                            interruptQueue.add(Interrupts.pageFault);
                             break;
                         }
                         if (legal(enderecoFisicoSTD)) {
@@ -184,7 +184,7 @@ public class CPU implements Runnable {
                     case STX: // [Rd] ←Rs
                         int enderecoFisicoSTX = mm.mmu(reg[ir.ra]);
                         if (enderecoFisicoSTX == -1) {
-                            irpt = Interrupts.pageFault; // se nao for valido, liga interrupcao de page fault
+                            interruptQueue.add(Interrupts.pageFault);
                             break;
                         }
                         if (legal(enderecoFisicoSTX)) {
